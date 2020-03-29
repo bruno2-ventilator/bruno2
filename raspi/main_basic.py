@@ -60,16 +60,16 @@ class vent_ui(QWidget):
         self.v_tidal_log = []
         self.use_port = False
         
-    @pyqtSlot()
-    def handle_error(self, er):
-        if er == ERROR_CODES.WATCHDOG_FAIL:
-            print("Failed watchdog")
+    # @pyqtSlot()
+    # def handle_error(self, er):
+    #     if er == ERROR_CODES.WATCHDOG_FAIL:
+    #         print("Failed watchdog")
         
             
-    @pyqtSlot(float)
-    def handle_thread_to_main(self,val):
-        print("handled in main:")
-        print(val)
+    # @pyqtSlot(float)
+    # def handle_thread_to_main(self,val):
+    #     print("handled in main:")
+    #     print(val)
     
     #updates go teensy->pi, changes go pi->teensy
     @pyqtSlot()
@@ -103,18 +103,30 @@ class vent_ui(QWidget):
                     return
                 func = handle_dict[command_num]
                 func(int(message[begin_val+1:end_val]))
-
+                self.acknowledge()
             elif message[1]== ord('e'):
+                self.acknowledge()
                 return
             elif message[1]== ord('c'):
+                self.acknowledge()
                 return
             elif message[1]== ord('b'):
+                self.acknowledge()
                 return
             elif message[1:3]== b"kt":
+                self.acknowledge()
                 return
             else:
                 return
 
+    def acknowledge(self):
+        if self.connect_status and self.ser.is_open:
+            try:
+                self.ser.write(b'/kt')
+            except:
+                self.raise_alert(ALERT_CODES.FAIL_CONNECT)
+        else:
+            self.raise_alert(ALERT_CODES.FAIL_CONNECT)
     #Returns float
     def pa_to_cm(self, val):
         return 0.0101972*val   
@@ -132,14 +144,11 @@ class vent_ui(QWidget):
         return int(val/0.001)
 
     def update_P_PEAK(self, val):
-        #print(val)
         converted_val = int(self.pa_to_cm(val))
         self.p_peak_current_out.setText(str(converted_val))
         max_diff = .1*self.p_peak_max
         curr_p_peak_min =  self.p_peak_set-max_diff
         curr_p_peak_max = self.p_peak_set+max_diff
-        print(curr_p_peak_max)
-        print(curr_p_peak_min)
         if converted_val > curr_p_peak_max or converted_val < curr_p_peak_min:
             self.raise_alert(ALERT_CODES.P_PEAK)
             self.p_peak_current_out.setStyleSheet("QLabel{color: red;}")
@@ -232,7 +241,6 @@ class vent_ui(QWidget):
     def resolve_alert(self,alert):
         if(alert in self.alert_list):
             self.alert_list.remove(alert)
-            print(len(self.alert_list))
             if len(self.alert_list)>0:
                 self.alert_out.setText("ALERT: " + self.alert_list[len(self.alert_list)-1].value)
             else:
@@ -247,7 +255,6 @@ class vent_ui(QWidget):
         if self.connect_status and self.ser.is_open:
             try:
                 self.ser.write(bytes(command,encoding='ascii'))
-                #print("Sent: %s" % command)
             except:
                 self.raise_alert(ALERT_CODES.FAIL_CONNECT)
         else:
@@ -304,10 +311,8 @@ class vent_ui(QWidget):
     @pyqtSlot()
     def connect_coms(self):  
         self.baud = 115200
-        print(self.port)
         self.ser = Serial(baudrate =  self.baud,timeout= 1)
         self.ser.port = self.port
-        print(self.port)
         try:
             self.ser.open()
         except (SerialException):
@@ -406,9 +411,7 @@ class vent_ui(QWidget):
             message = b'/st'
             new_status = True
             text = "Stop"
-            print(self.running)
             if self.running:
-                print("reached")
                 message = b'/pt'
                 new_status = False
                 text = "Run"

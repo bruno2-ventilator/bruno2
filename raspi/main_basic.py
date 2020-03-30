@@ -7,9 +7,10 @@
 
 from PyQt5 import uic
 from time import sleep
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, pyqtSlot, QTimer, QObject
+from PyQt5.QtCore import QEvent, QThread, pyqtSignal, Qt, pyqtSlot, QTimer, QObject
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QDoubleSpinBox, QComboBox, QLabel, QHBoxLayout
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QKeyEvent
 import os
 from serial import Serial, SerialException
 from enum import Enum
@@ -38,13 +39,14 @@ class ALERT_CODES(Enum):
     PEEP_HIGH = "PEEP High"
     PEEP_LOW = "PEEP Low"
     V_TE_HIGH = "V_TE High"
-    V_TE_LOW = "V_TE Low"
+    V_TE_LOW = "V_TE    Low"
     MIN_VENT_HIGH = "Min. Vent High"
     MIN_VENT_LOW = "Min. Vent Low"
         
-class vent_ui(QWidget):
-
+class vent_ui(QMainWindow):
     def __init__(self):
+        #QWidget.__init__(self)
+
         super(self.__class__, self).__init__()
         self.setup_ui()
         self.port = 'COM10'
@@ -70,7 +72,7 @@ class vent_ui(QWidget):
     # def handle_thread_to_main(self,val):
     #     print("handled in main:")
     #     print(val)
-    
+
     #updates go teensy->pi, changes go pi->teensy
     @pyqtSlot()
     def check_serial(self):
@@ -248,6 +250,21 @@ class vent_ui(QWidget):
                 self.alert_out.setStyleSheet("QLabel{color: black;}")
 
     
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Plus:
+                new_event = QKeyEvent(QEvent.KeyPress,Qt.Key_Tab,Qt.NoModifier)
+                self.window.event(new_event)
+                return True
+            elif event.key() == Qt.Key_Minus:
+                new_event = QKeyEvent(QEvent.KeyPress,Qt.Key_Tab,Qt.ShiftModifier)
+                self.window.event(new_event)
+                return True
+            else:
+                return False
+        return False
+
+
 
     #Value is not converted, should be int
     def send_command(self, enum_num, value):
@@ -336,11 +353,15 @@ class vent_ui(QWidget):
         self.window = Window()
         self.form.setupUi(self.window)
         
+        
+
         self.connect_button = self.window.findChild(QPushButton, 'connect_button')
         self.connect_button.clicked.connect(self.connect_coms)
+        self.connect_button.installEventFilter(self)
 
         self.run_button = self.window.findChild(QPushButton,'run_button')
         self.run_button.clicked.connect(self.run_clicked)
+        self.run_button.installEventFilter(self)
         
         self.p_peak_set = 20 
         self.peep_set = 10 
@@ -358,42 +379,52 @@ class vent_ui(QWidget):
         
         #Set Values
         self.p_peak_set_entry = self.window.findChild(QDoubleSpinBox, 'p_peak_set_entry')
+        self.p_peak_set_entry.installEventFilter(self)
         self.p_peak_set_entry.setValue(self.p_peak_set)
         self.p_peak_set_entry.valueChanged.connect(self.changed_p_peak)
         
         self.peep_set_entry = self.window.findChild(QDoubleSpinBox, 'peep_set_entry')
+        self.peep_set_entry.installEventFilter(self)
         self.peep_set_entry.setValue(self.peep_set)
         self.peep_set_entry.valueChanged.connect(self.changed_peep)
         
         self.peep_high_entry = self.window.findChild(QDoubleSpinBox, 'peep_high_entry')
+        self.peep_high_entry.installEventFilter(self)
         self.peep_high_entry.setValue(self.peep_high)
         self.peep_high_entry.valueChanged.connect(self.changed_peep_high)
         
         self.peep_low_entry = self.window.findChild(QDoubleSpinBox, 'peep_low_entry')
+        self.peep_low_entry.installEventFilter(self)
         self.peep_low_entry.setValue(self.peep_low)
         self.peep_low_entry.valueChanged.connect(self.changed_peep_low)
         
         self.min_vent_high_entry = self.window.findChild(QDoubleSpinBox, 'min_vent_high_entry')
+        self.min_vent_high_entry.installEventFilter(self)
         self.min_vent_high_entry.setValue(self.min_vent_high)
         self.min_vent_high_entry.valueChanged.connect(self.min_vent_high_changed)
         
         self.min_vent_low_entry = self.window.findChild(QDoubleSpinBox, 'min_vent_low_entry')
+        self.min_vent_low_entry.installEventFilter(self)
         self.min_vent_low_entry.setValue(self.min_vent_low)
         self.min_vent_low_entry.valueChanged.connect(self.min_vent_low_changed)
         
         self.rr_set_entry = self.window.findChild(QDoubleSpinBox, 'rr_set_entry')
+        self.rr_set_entry.installEventFilter(self)
         self.rr_set_entry.setValue(self.rr)
         self.rr_set_entry.valueChanged.connect(self.rr_changed)
         
         self.ie_set_entry = self.window.findChild(QDoubleSpinBox, 'ie_set_entry')
+        self.ie_set_entry.installEventFilter(self)
         self.ie_set_entry.setValue(self.ie)
         self.ie_set_entry.valueChanged.connect(self.ie_changed)
         
         self.v_te_high_entry = self.window.findChild(QDoubleSpinBox, 'v_te_high_entry')
+        self.v_te_high_entry.installEventFilter(self)
         self.v_te_high_entry.setValue(self.v_te_high)
         self.v_te_high_entry.valueChanged.connect(self.v_te_high_changed)
         
         self.v_te_low_entry = self.window.findChild(QDoubleSpinBox, 'v_te_low_entry')
+        self.v_te_low_entry.installEventFilter(self)
         self.v_te_low_entry.setValue(self.v_te_low)
         self.v_te_low_entry.valueChanged.connect(self.v_te_low_changed)
         

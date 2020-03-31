@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=BrunO2
+Comment=BrunO2 GUI
+NoDisplay=false
+Exec=/usr/bin/lxterminal -e /home/pi/bruno2/raspi/startBrunO2.sh
+NotShowIn=GNOME;KDE;XFCE;

@@ -63,7 +63,9 @@ class vent_ui(QMainWindow):
         self.running = False
         self.v_tidal_log = []
         self.use_port = False
-        
+        self.init_setting_codes = [SETTING_CODES.PIP,SETTING_CODES.PEEP,SETTING_CODES.RR,SETTING_CODES.IE]
+        self.init_settings = [self.pip_set,self.peep_set,self.rr,self.inhale/self.exhale]
+
     # @pyqtSlot()
     # def handle_error(self, er):
     #     if er == ERROR_CODES.WATCHDOG_FAIL:
@@ -124,7 +126,7 @@ class vent_ui(QMainWindow):
     def acknowledge(self):
         if self.connect_status and self.ser.is_open:
             try:
-                self.ser.write(b'/kt')
+                self.ser.write(b'/kt\n')
             except:
                 self.raise_alert(ALERT_CODES.FAIL_CONNECT)
         else:
@@ -266,9 +268,14 @@ class vent_ui(QMainWindow):
 
 
 
-    #Value is not converted, should be int
+    #Value is not converted
     def send_command(self, enum_num, value):
-        command = "/cs%dv%dt" % (enum_num.value,value)
+        command = ""
+        if enum_num == SETTING_CODES.IE:
+            command = "/cs%dv%2.3fdt\n" % (enum_num.value,value)
+            #print(command)
+        else:
+            command = "/cs%dv%dt\n" % (enum_num.value,value)
         if self.connect_status and self.ser.is_open:
             try:
                 self.ser.write(bytes(command,encoding='ascii'))
@@ -313,10 +320,14 @@ class vent_ui(QMainWindow):
         self.send_command(SETTING_CODES.RR,val)
 
     @pyqtSlot(float)
-    def ie_changed(self,val):
-        self.ie = val
-        self.send_command(SETTING_CODES.IE,int(val*100))
+    def inhale_changed(self,val):
+        self.inhale = val
+        self.send_command(SETTING_CODES.IE,self.inhale/self.exhale)
     
+    def exhale_changed(self,val):
+        self.exhale = val
+        self.send_command(SETTING_CODES.IE,self.inhale/self.exhale)
+
     @pyqtSlot(float)
     def v_te_high_changed(self,val):
         self.v_te_high = val
@@ -327,6 +338,19 @@ class vent_ui(QMainWindow):
         self.v_te_high = val
         self.send_command(SETTING_CODES.V_TE_LOW,self.L_to_cm3(val))
     
+    @pyqtSlot()
+    def send_init_settings(self):
+        if len(self.init_setting_codes)>0:
+            code = self.init_setting_codes.pop()
+            val = self.init_settings.pop()
+            #print(code)
+            self.send_command(code,val)
+            if len(self.init_setting_codes) == 0:
+                self.connect_timer.stop()
+        else:
+            self.init_setting_codes = [SETTING_CODES.PIP,SETTING_CODES.PEEP,SETTING_CODES.RR,SETTING_CODES.IE]
+            self.init_settings = [self.pip_set,self.peep_set,self.rr,self.inhale/self.exhale]
+
     @pyqtSlot()
     def connect_coms(self):  
         self.baud = 115200
@@ -345,7 +369,10 @@ class vent_ui(QMainWindow):
             self.alert_out.setStyleSheet("QLabel{color: black;}")
             self.settings_box.setEnabled(True)
             self.connect_status = True
+            self.connect_timer = QTimer()
+            self.connect_timer.timeout.connect(self.send_init_settings)
             self.serial_timer.start(200)
+            self.connect_timer.start(100)
         return
     
     def setup_ui(self):
@@ -373,7 +400,8 @@ class vent_ui(QMainWindow):
         self.min_vent_high = 2
         self.min_vent_low = .1
         self.rr = 20
-        self.ie = 1
+        self.inhale = 1
+        self.exhale = 1
         self.v_te_high = 1 #Liters
         self.v_te_low = 0
         
@@ -416,11 +444,16 @@ class vent_ui(QMainWindow):
         self.rr_set_entry.setValue(self.rr)
         self.rr_set_entry.valueChanged.connect(self.rr_changed)
         
-        self.ie_set_entry = self.window.findChild(QDoubleSpinBox, 'ie_set_entry')
-        self.ie_set_entry.installEventFilter(self)
-        self.ie_set_entry.setValue(self.ie)
-        self.ie_set_entry.valueChanged.connect(self.ie_changed)
+        self.inhale_set_entry = self.window.findChild(QDoubleSpinBox, 'inhale_set_entry')
+        self.inhale_set_entry.installEventFilter(self)
+        self.inhale_set_entry.setValue(self.inhale)
+        self.inhale_set_entry.valueChanged.connect(self.inhale_changed)
         
+        self.exhale_set_entry = self.window.findChild(QDoubleSpinBox, 'exhale_set_entry')
+        self.exhale_set_entry.installEventFilter(self)
+        self.exhale_set_entry.setValue(self.exhale)
+        self.exhale_set_entry.valueChanged.connect(self.exhale_changed)
+
         self.v_te_high_entry = self.window.findChild(QDoubleSpinBox, 'v_te_high_entry')
         self.v_te_high_entry.installEventFilter(self)
         self.v_te_high_entry.setValue(self.v_te_high)
@@ -442,11 +475,11 @@ class vent_ui(QMainWindow):
     
     def run_clicked(self):
         if self.connect_status and self.ser.is_open:
-            message = b'/st'
+            message = b'/st\n'
             new_status = True
             text = "Stop"
             if self.running:
-                message = b'/pt'
+                message = b'/pt\n'
                 new_status = False
                 text = "Run"
             try:

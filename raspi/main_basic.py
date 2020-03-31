@@ -23,7 +23,7 @@ class ERROR_CODES(Enum):
     WATCHDOG_FAIL = 1
 
 class SETTING_CODES(Enum):
-    P_PEAK = 1
+    PIP = 1
     PEEP = 2
     PEEP_HIGH = 3
     PEEP_LOW = 4
@@ -33,7 +33,7 @@ class SETTING_CODES(Enum):
     V_TE_LOW = 8
 
 class ALERT_CODES(Enum):
-    P_PEAK = "P_PEAK out of range"
+    PIP = "PIP out of range"
     FAIL_CONNECT = "Failed to connect"
     BAD_MESSAGE = "Recieved bad message"
     PEEP_HIGH = "PEEP High"
@@ -50,7 +50,9 @@ class vent_ui(QMainWindow):
         super(self.__class__, self).__init__()
         self.setup_ui()
         self.port = 'COM10'
-        self.p_peak_max = 40
+        self.pip_max = 65
+        self.ip_max = 40
+
         self.serial_timer = QTimer()
         self.serial_timer.timeout.connect(self.check_serial)
         self.connect_status = False
@@ -79,47 +81,46 @@ class vent_ui(QMainWindow):
         #print("Checking serial...")
         #TODO: Catch Exceptions for disconnections
         if self.ser.in_waiting:
-            message  = self.ser.read(self.ser.in_waiting)
-            #print(message)
-            if len(message)<3:
-                #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
-                return
-            if (message[1]== ord('m')):
-                begin_val = message.find(b'v')
-                end_val = message.find(b't')
-                command_num_index =message.find(b's')
-                ascii_to_int = 48
-                if begin_val <0 or end_val <0 or command_num_index <0:
-                    #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
-                    return
-                handle_dict = {\
-                1:self.update_P_PEAK, \
-                2:self.update_O2_flow, \
-                3:self.update_air_flow, \
-                4:self.update_PEEP, \
-                5:self.update_V_TIDAL, \
-                6:self.update_V_TE}
-                command_num = message[command_num_index+1]-ascii_to_int
-                if command_num > 6 or command_num < 1:
-                    #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
-                    return
-                func = handle_dict[command_num]
-                func(int(message[begin_val+1:end_val]))
-                self.acknowledge()
-            elif message[1]== ord('e'):
-                self.acknowledge()
-                return
-            elif message[1]== ord('c'):
-                self.acknowledge()
-                return
-            elif message[1]== ord('b'):
-                self.acknowledge()
-                return
-            elif message[1:3]== b"kt":
-                self.acknowledge()
-                return
-            else:
-                return
+            messages  = self.ser.read(self.ser.in_waiting).split(b"/")
+            
+            for message in messages:
+                if len(message)>=3:
+                    if (message[0]== ord('m')):
+                        begin_val = message.find(b'v')
+                        end_val = message.find(b't')
+                        command_num_index =message.find(b's')
+                        ascii_to_int = 48
+                        if begin_val <0 or end_val <0 or command_num_index <0:
+                            #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
+                            return
+                        handle_dict = {\
+                        1:self.update_PIP, \
+                        2:self.update_O2_flow, \
+                        3:self.update_air_flow, \
+                        4:self.update_PEEP, \
+                        5:self.update_V_TIDAL, \
+                        6:self.update_V_TE}
+                        command_num = message[command_num_index+1]-ascii_to_int
+                        if command_num > 6 or command_num < 1:
+                            #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
+                            return
+                        func = handle_dict[command_num]
+                        func(int(message[begin_val+1:end_val]))
+                        self.acknowledge()
+                    elif message[0]== ord('e'):
+                        self.acknowledge()
+                        return
+                    elif message[0]== ord('c'):
+                        self.acknowledge()
+                        return
+                    elif message[0]== ord('b'):
+                        self.acknowledge()
+                        return
+                    elif message[0:2]== b"kt":
+                        self.acknowledge()
+                        return
+                    else:
+                        return
 
     def acknowledge(self):
         if self.connect_status and self.ser.is_open:
@@ -145,24 +146,24 @@ class vent_ui(QMainWindow):
     def L_to_cm3(self, val):
         return int(val/0.001)
 
-    def update_P_PEAK(self, val):
-        converted_val = int(self.pa_to_cm(val))
-        self.p_peak_current_out.setText(str(converted_val))
-        max_diff = .1*self.p_peak_max
-        curr_p_peak_min =  self.p_peak_set-max_diff
-        curr_p_peak_max = self.p_peak_set+max_diff
-        if converted_val > curr_p_peak_max or converted_val < curr_p_peak_min:
-            self.raise_alert(ALERT_CODES.P_PEAK)
-            self.p_peak_current_out.setStyleSheet("QLabel{color: red;}")
+    def update_PIP(self, val):
+        converted_val = int(round(self.pa_to_cm(val)))
+        self.pip_current_out.setText(str(converted_val))
+        max_diff = .1*self.ip_max
+        curr_pip_min =  self.pip_set-max_diff
+        curr_pip_max = self.pip_set+max_diff
+        if converted_val > curr_pip_max or converted_val < curr_pip_min:
+            self.raise_alert(ALERT_CODES.PIP)
+            self.pip_current_out.setStyleSheet("QLabel{color: red;}")
         else:
-            self.resolve_alert(ALERT_CODES.P_PEAK)
-            self.p_peak_current_out.setStyleSheet("QLabel{color: black;}")
+            self.resolve_alert(ALERT_CODES.PIP)
+            self.pip_current_out.setStyleSheet("QLabel{color: black;}")
          
     def update_O2_flow(self, val):
         self.O2_flow = val
         if self.recieved_flow:
             self.fiO2 = (self.O2_flow+self.air_flow*.21)/(self.O2_flow+self.air_flow)*100
-            self.fiO2_out.setText(str(int(self.fiO2)))
+            self.fiO2_out.setText(str(int(round(self.fiO2))))
             self.recieved_flow = False
         else:
             self.recieved_flow = True
@@ -171,14 +172,14 @@ class vent_ui(QMainWindow):
         self.air_flow = val
         if self.recieved_flow:
             self.fiO2 = (self.O2_flow+self.air_flow*.21)/(self.O2_flow+self.air_flow)*100
-            self.fiO2_out.setText(str(int(self.fiO2)))
+            self.fiO2_out.setText(str(int(round(self.fiO2))))
             self.recieved_flow = False
         else:
             self.recieved_flow = True
 
     def update_PEEP(self, val):
         converted_val = self.pa_to_cm(val)
-        self.peep_current_out.setText(str(int(converted_val)))
+        self.peep_current_out.setText(str(int(round(converted_val))))
         if converted_val>self.peep_high:
             self.raise_alert(ALERT_CODES.PEEP_HIGH)
             self.peep_current_out.setStyleSheet("QLabel{color: red;}")
@@ -278,14 +279,16 @@ class vent_ui(QMainWindow):
             self.raise_alert(ALERT_CODES.FAIL_CONNECT)
     
     @pyqtSlot(float)   
-    def changed_p_peak(self,val):
-        self.p_peak_set = val
-        self.send_command(SETTING_CODES.P_PEAK,self.cm_to_pa(val))
+    def changed_ip(self,val):
+        self.ip_set = val
+        self.pip_set = val + self.peep_set
+        self.send_command(SETTING_CODES.PIP,self.cm_to_pa(self.pip_set))
 
     @pyqtSlot(float)
     def changed_peep(self,val):
         self.peep_set = val
-        self.send_command(SETTING_CODES.PEEP,self.cm_to_pa(val))
+        self.pip_set = val + self.ip_set
+        self.send_command(SETTING_CODES.PEEP,self.cm_to_pa(self.pip_set))
 
     @pyqtSlot(float)    
     def changed_peep_high(self,val):
@@ -363,8 +366,9 @@ class vent_ui(QMainWindow):
         self.run_button.clicked.connect(self.run_clicked)
         self.run_button.installEventFilter(self)
         
-        self.p_peak_set = 20 
+        self.ip_set = 20 
         self.peep_set = 10 
+        self.pip_set = 30
         self.peep_high = 15 
         self.peep_low = 5
         self.min_vent_high = 2
@@ -378,10 +382,10 @@ class vent_ui(QMainWindow):
         self.settings_box.setEnabled(False)
         
         #Set Values
-        self.p_peak_set_entry = self.window.findChild(QDoubleSpinBox, 'p_peak_set_entry')
-        self.p_peak_set_entry.installEventFilter(self)
-        self.p_peak_set_entry.setValue(self.p_peak_set)
-        self.p_peak_set_entry.valueChanged.connect(self.changed_p_peak)
+        self.ip_set_entry = self.window.findChild(QDoubleSpinBox, 'ip_set_entry')
+        self.ip_set_entry.installEventFilter(self)
+        self.ip_set_entry.setValue(self.ip_set)
+        self.ip_set_entry.valueChanged.connect(self.changed_ip)
         
         self.peep_set_entry = self.window.findChild(QDoubleSpinBox, 'peep_set_entry')
         self.peep_set_entry.installEventFilter(self)
@@ -429,7 +433,7 @@ class vent_ui(QMainWindow):
         self.v_te_low_entry.valueChanged.connect(self.v_te_low_changed)
         
         #Output values
-        self.p_peak_current_out = self.window.findChild(QLabel, 'p_peak_current_out')
+        self.pip_current_out = self.window.findChild(QLabel, 'pip_current_out')
         self.peep_current_out = self.window.findChild(QLabel, 'peep_current_out')
         self.min_vent_current_out = self.window.findChild(QLabel, 'min_vent_current_out')
         self.v_tidal_out = self.window.findChild(QLabel, 'v_tidal_out')

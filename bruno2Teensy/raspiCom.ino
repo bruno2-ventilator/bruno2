@@ -4,6 +4,7 @@
 
 
 char rcmdbuff[BUFFSIZE];
+bool enableOutput = false;
 
 /*********************************************/
 /*           BRUNO2 VENTILATOR               */
@@ -70,8 +71,11 @@ void raspiCmdInterp(){
     case 'm':
       //
       break;
-    case 'e':
-      //
+    case 'p':
+      enableRespirator();
+      break;
+    case 's':
+      enableRespirator();
       break;
     case 'c':
       j   = findBuffIdx('v');
@@ -167,5 +171,21 @@ int findBuffValueFloat(int from, int to){
 void sendAckMsg(){
   Serial.println("/kt");
 }
+/*-------------------------------------------*/
+
+bool respEnableSt(){
+  return enableOutput;
+}
+/*-------------------------------------------*/
+
+void enableRespirator(){
+  enableOutput = true;
+}
+/*-------------------------------------------*/
+
+void disableRespirator(){
+  enableOutput = false;
+}
+/*-------------------------------------------*/
 
 /*EOF*/

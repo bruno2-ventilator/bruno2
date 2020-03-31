@@ -7,7 +7,6 @@
 /*            CONTROL VARIABLES              */
 /*-------------------------------------------*/
 
-bool enableOutput = false;
 
 //flow meters
 //venturiFlow oxFlow;
@@ -44,22 +43,22 @@ uint8_t pinBuzzer = 23;
 
 //TODO -- this should be defined here, now on main ino for now
 ////setpoints
-//int pPeek;  //pascals
+//int pPeak;  //pascals
 //int pPeep;  //pascals
 //int respR;  //resp/min in millis() period
 //int inhExh; //exhale/inhale float
 //
 ////alarm setpoints
-//int pPeekHigh;
-//int pPeekLow;
+//int pPeepHigh;
+//int pPeepLow;
 //int mVentHigh;
 //int mVentLow;
 //int tidVolExHigh;
 //int tidVolExLow;
 
 //alarm flags
-bool pPeekHighFl    = false;
-bool pPeekLowFl     = false;
+bool pPeepHighFl    = false;
+bool pPeepLowFl     = false;
 bool mVentHighFl    = false;
 bool mVentLowFl     = false;
 bool tidVolExHighFl = false;
@@ -72,8 +71,8 @@ uint32_t fOxygenAv = 0; //cm^3/s
 uint32_t fOxygenN  = 0; //number val
 uint32_t fAirAv    = 0; //cm^3/s
 uint32_t fAirN     = 0; //number val
-uint32_t pPeekAv   = 0; //Pascals
-uint32_t pPeekN    = 0; //number val
+uint32_t pPeepAv   = 0; //Pascals
+uint32_t pPeepN    = 0; //number val
 
 uint32_t inhVolAv    = 0;
 uint32_t inhVolN     = 0;
@@ -99,7 +98,6 @@ int currCnt   = 0;
 void initTeensyModules(){
   //start spi interface
   SPI.begin();
-
 }
 /*-------------------------------------------*/
 
@@ -119,6 +117,8 @@ void initControl(){
   inhaleValve.init(pinInhale);
   exhaleValve.init(pinExhale);
 
+  exhaleValve.closeVlave();
+
   //led indicators and buzzer indicator
   initStatusIndic();
 
@@ -127,7 +127,6 @@ void initControl(){
   exhaleValveLatch = true;
   exhaleValve.openValve();
   inhaleValve.closeValve();
-
 }
 /*-------------------------------------------*/
 
@@ -136,22 +135,24 @@ void initControl(){
 /*           RESPIRATION SERVICES            */
 /*-------------------------------------------*/
 
-bool respEnableSt(){
-  return enableOutput;
-}
-/*-------------------------------------------*/
+//TODO -- here for now
+void reportAvarages(){
+  Serial.print("/ms1v");
+  Serial.print(pPeakAv);
+  Serial.println("t");
 
-void enableRespirator(){
-  enableOutput = true;
-}
-/*-------------------------------------------*/
+  Serial.print("/ms4v");
+  Serial.print(pPeepAv);
+  Serial.println("t");
 
-void disableRespirator(){
-  enableOutput = false;
-}
-/*-------------------------------------------*/
+  Serial.print("/ms5v");
+  Serial.print(inhVolAv);
+  Serial.println("t");
 
-void reportAvarages(){}
+  Serial.print("/ms6v");
+  Serial.print(exhVolAv);
+  Serial.println("t");
+}
 /*-------------------------------------------*/
 
 
@@ -172,7 +173,7 @@ void inhaleControl(){
       currCnt = 0;
     }
   }else{
-  computeAverages();
+    computeAverages();
   }
 }
 /*-------------------------------------------*/
@@ -189,7 +190,7 @@ void exhaleControl(){
       currCnt = 0;
     }
   }else{
-  computeAverages();
+    computeAverages();
   }
 }
 /*-------------------------------------------*/
@@ -218,8 +219,8 @@ void computeAverages(){
     }
   }
   else if(!inhalationFlag && exhalationFlag){
-    pPeekAv = ((pPeekAv*pPeekN)+pExhale.getP())/(pPeekN+1); 
-    pPeekN++;
+    pPeepAv = ((pPeepAv*pPeepN)+pExhale.getP())/(pPeepN+1); 
+    pPeepN++;
     if(exhLastF==0){
       exhLastF = exFlow.getFlow();
       exhLastT = micros();
@@ -236,6 +237,7 @@ void computeAverages(){
 /*-------------------------------------------*/
 
 
+
 /*********************************************/
 /*              ADHOC SERVICES               */
 /*-------------------------------------------*/
@@ -250,8 +252,8 @@ void resetAvarages(){
   fOxygenN  = 0; //number val
   fAirAv    = 0; //cm^3/s
   fAirN     = 0; //number val
-  pPeekAv   = 0; //Pascals
-  pPeekN    = 0; //number val
+  pPeepAv   = 0; //Pascals
+  pPeepN    = 0; //number val
   inhVolAv  = 0;
   inhVolN   = 0;
   exhVolAv  = 0;

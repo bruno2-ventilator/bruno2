@@ -27,7 +27,7 @@ class pinchValve
     bool _direction    = false; //change to true if rotating is opposite
     int _stepsPerRev   = 200; //from motor datasheet
     int _mStPerRev;
-    int _currentSet    = 250;
+    int _currentSet    = 200;
     uint16_t _stepMode = 8;
     //uint16_t _stepMode = HPSDStepMode::MicroStep8;
     HighPowerStepperDriver *mot;

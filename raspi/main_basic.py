@@ -82,7 +82,6 @@ class vent_ui(QMainWindow):
         #TODO: Catch Exceptions for disconnections
         if self.ser.in_waiting:
             messages  = self.ser.read(self.ser.in_waiting).split(b"/")
-            
             for message in messages:
                 if len(message)>=3:
                     if (message[0]== ord('m')):

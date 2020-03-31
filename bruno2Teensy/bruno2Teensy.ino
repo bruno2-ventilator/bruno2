@@ -50,7 +50,7 @@ bool exhalationFlag = false;
 int pPeak    = 2500; //pascals
 int pPeep    = 1200; //pascals
 int respR    = (int)(60*1000000/25); //resp/min in millis() period
-float inhExh = 2; //exhale/inhale float
+float inhExh = 4; //exhale/inhale float
 
 //alarm setpoints
 int pPeepHigh    = 1500;
@@ -91,7 +91,7 @@ void setup() {
   }
 
   updateRespSetpoints();
-  //TODO -- lisent for msg
+  //TODO -- lisent for msg DELETE AFTER PI SETUP
   enableRespirator();
 
 

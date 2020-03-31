@@ -163,7 +163,7 @@ void reportAvarages(){
 
 void inhaleControl(){
   if(inhaleValveLatch){
-    if(moveSteps<currCnt){
+    if(moveSteps>currCnt){
       inhaleValve.open1StValve();  
       exhaleValve.close1StValve();  
       currCnt++;
@@ -180,7 +180,7 @@ void inhaleControl(){
 
 void exhaleControl(){
   if(exhaleValveLatch){
-    if(moveSteps<currCnt){
+    if(moveSteps>currCnt){
       exhaleValve.open1StValve();  
       inhaleValve.close1StValve();  
       currCnt++;
@@ -232,7 +232,6 @@ void computeAverages(){
       exhLastT = micros();
     }
   }
-
 }
 /*-------------------------------------------*/
 

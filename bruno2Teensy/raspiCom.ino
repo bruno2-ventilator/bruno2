@@ -73,9 +73,11 @@ void raspiCmdInterp(){
       break;
     case 'p':
       enableRespirator();
+      sendAckMsg();
       break;
     case 's':
       enableRespirator();
+      sendAckMsg();
       break;
     case 'c':
       j   = findBuffIdx('v');

@@ -4,53 +4,50 @@
 
 
 #include "Arduino.h"
-#include "./lib/venturiFlow.h"
-#include "./lib/pressureSensor.h"
+#include "libraries/venturiFlow.h"
+#include "libraries/honeywellHsc.h"
+
+#define PRINTDEB false
 
 /*********************************************/
 /*                 METHODS                   */
 /*-------------------------------------------*/
 
+void venturiFlow::init(uint8_t pAdd){
+  //init sensor with addres for p1 and p2
+  pSen = new honeywellHsc();
 
-
-venturiFlow::venturiFlow(int p1add, int p2add){
-  _p1add = p1add;
-  _p2add = p2add;
-  initSensor();
+  pSen->init(pAdd, _pRangeSense);
+  pSen->setUnits('a');
+  if(PRINTDEB){Serial.println("m: init flow");}
 }
 /*-------------------------------------------*/
 
-void venturiFlow::setUnits(char unit){
-
+void venturiFlow::setUnits(char units){
+  if(units=='l' || units=='m' || units=='i'){
+    _units = units;
+    _unitChFlag = 1;
+  }
+  else{
+    if(PRINTDEB){Serial.println("m: not a valid unit");}
+  }
 }
 /*-------------------------------------------*/
 
 char venturiFlow::getUnits(){
-
+  if(PRINTDEB){
+    Serial.print("m: Flow sensor units ");
+  }
+  return _units;
 }
 /*-------------------------------------------*/
 
 float venturiFlow::getFlow(){
-  //call get pressure senor for both
-  //convert using _calib
+  float tpSen;
+  tpSen = pSen->getP();
+
+  return tpSen*_calib;
 }
 /*-------------------------------------------*/
 
-void venturiFlow::initSensor(){
-  //init sensor with addres for p1 and p2
-}
-/*-------------------------------------------*/
-
-
-
-int _p1add;
-
-int _p2add;
-
-int _calib;
-
-
-};//EOF
-#endif
-/*-------------------------------------------*/
-/*eof*/
+/*EOF*/

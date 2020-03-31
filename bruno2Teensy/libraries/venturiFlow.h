@@ -1,31 +1,30 @@
 /*|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
-/*                     HSCMRRN060MDSA3 PRESSURE SENSOR                     */
+/*                          VENTURI FLOW METER                             */
 /*-------------------------------------------------------------------------*/
 
-#ifndef hscmrrn060mdsa3_h
-#define hscmrrn060mdsa3_h
+#ifndef venturiFlow_h
+#define venturiFlow_h
 
-#include <Arduino.h>
-#include <SPI.h>
+#include "Arduino.h"
+#include "honeywellHsc.h"
 
 /*********************************************/
 /*                CLASS DEF                  */
 /*-------------------------------------------*/
-class hscmrrn060mdsa3
+class venturiFlow
 {
 
   public:
-    hscmrrn060mdsa3(uint8_t spics);
+    void init(uint8_t pAdd);
     void setUnits(char units);
     char getUnits();
-    uint16_t getRaw();
-    float getP();
+    float getFlow();
   private:
-    const int _clkFreq = 50000; //hz - 50~800khz
-    char      _units   = 'p';
-    uint8_t   _spics;
-    float     _calib   = 0.34;
-    float     _tempC;
+    const int _pRangeSense = 6000; //using hscmrrn060mdsa3
+    float  _calib = 0.34;
+    char  _units = 'l';
+    uint8_t _unitChFlag = 1;
+    honeywellHsc *pSen;
 
 };
 #endif

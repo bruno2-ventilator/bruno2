@@ -81,7 +81,6 @@ void setup() {
   loop700HzTime   = micros();
   loop100HzTime   = micros();
   respStartTime   = micros();
-  
 
   //get all the initial setpoints
   while(!allSetptsReady()){
@@ -168,7 +167,7 @@ void loop() {
     if(respRateServ){
       respRateServ = false;
       updateRespSetpoints();
-      //sendAverageVal();
+      reportAvarages();
     }  
     /*******************************************/
   

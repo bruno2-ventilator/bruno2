@@ -117,7 +117,7 @@ void initControl(){
   inhaleValve.init(pinInhale);
   exhaleValve.init(pinExhale);
 
-  exhaleValve.closeVlave();
+  exhaleValve.closeValve();
 
   //led indicators and buzzer indicator
   initStatusIndic();

@@ -83,7 +83,7 @@ void setup() {
   respStartTime   = micros();
 
   //get all the initial setpoints
-  while(!allSetptsReady()){
+  while(!allSetptsReady() && !respEnableSt()){
     if(isRaspiCmdAv()){
       raspiCmdInterp();
       runOneRaspiCmd();
@@ -92,7 +92,7 @@ void setup() {
 
   updateRespSetpoints();
   //TODO -- lisent for msg DELETE AFTER PI SETUP
-  enableRespirator();
+  //enableRespirator();
 
 
 }

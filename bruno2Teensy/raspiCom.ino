@@ -68,6 +68,18 @@ void raspiCmdInterp(){
   int val;
   i++;
   switch(rcmdbuff[i]){
+    case 'q':
+      inhaleValve.moveToPosRel(4);
+      break;
+    case 'w':
+      inhaleValve.moveToPosRel(-4);
+      break;
+    case 'z':
+      exhaleValve.moveToPosRel(4);
+      break;
+    case 'x':
+      exhaleValve.moveToPosRel(-4);
+      break;
     case 'm':
       //
       break;

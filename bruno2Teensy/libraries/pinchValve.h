@@ -24,7 +24,7 @@ class pinchValve
     void moveToPosRel(int pos);
   private:
     uint8_t _spics;
-    bool _direction    = false; //change to true if rotating is opposite
+    bool _direction    = true; //change to false if rotating is opposite
     int _stepsPerRev   = 200; //from motor datasheet
     int _mStPerRev;
     int _currentSet    = 200;

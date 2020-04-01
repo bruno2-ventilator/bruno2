@@ -122,6 +122,9 @@ void loop() {
 
     //run 700Hz services
     if(isTimeUp(loop700HzTime, loop700HzPeriod)){
+      //int tmp;
+      //tmp = micros()-loop700HzTime;
+      //if(tmp>1436){Serial.println(tmp);}
       loop700HzTime   = micros();
       
       //start respiration

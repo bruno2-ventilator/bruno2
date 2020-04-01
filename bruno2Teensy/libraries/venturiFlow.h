@@ -21,8 +21,7 @@ class venturiFlow
     float getFlow();
   private:
     const int _pRangeSense = 6000; //using hscmrrn060mdsa3
-    float  _calib = 0.34;
-    char  _units = 'l';
+    char  _units = 'l'; //lit/min
     uint8_t _unitChFlag = 1;
     honeywellHsc *pSen;
 

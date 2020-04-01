@@ -46,7 +46,7 @@ float venturiFlow::getFlow(){
   float tpSen;
   tpSen = pSen->getP();
 
-  return tpSen*_calib;
+  return (0.442*sqrt(tpSen*1000));
 }
 /*-------------------------------------------*/
 

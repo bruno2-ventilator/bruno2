@@ -43,18 +43,18 @@ uint8_t pinBuzzer = 23;
 
 //TODO -- this should be defined here, now on main ino for now
 ////setpoints
-//int pPeak;  //pascals
-//int pPeep;  //pascals
-//int respR;  //resp/min in millis() period
-//int inhExh; //exhale/inhale float
+//int pPeak  = -1; //pascals
+//int pPeep  = -1; //pascals
+//int respR  = -1; //resp/min in millis() period
+//int inhExh = -1; //exhale/inhale float
 //
 ////alarm setpoints
-//int pPeepHigh;
-//int pPeepLow;
-//int mVentHigh;
-//int mVentLow;
-//int tidVolExHigh;
-//int tidVolExLow;
+//int pPeepHigh    = -1;
+//int pPeepLow     = -1;
+////int mVentHigh    = -1;
+////int mVentLow     = -1;
+//int tidVolExHigh = -1;
+//int tidVolExLow  = -1;
 
 //alarm flags
 bool pPeepHighFl    = false;
@@ -125,7 +125,6 @@ void initControl(){
   //TODO -- start as exhale, use flags for now
   inhaleValveLatch = true;
   exhaleValveLatch = true;
-  exhaleValve.openValve();
   inhaleValve.closeValve();
 }
 /*-------------------------------------------*/
@@ -165,6 +164,7 @@ void inhaleControl(){
   if(inhaleValveLatch){
     if(moveSteps>currCnt){
       inhaleValve.open1StValve();  
+      delayMicroseconds(5);
       exhaleValve.close1StValve();  
       currCnt++;
     }else{
@@ -182,6 +182,7 @@ void exhaleControl(){
   if(exhaleValveLatch){
     if(moveSteps>currCnt){
       exhaleValve.open1StValve();  
+      delayMicroseconds(5);
       inhaleValve.close1StValve();  
       currCnt++;
     }else{
@@ -202,31 +203,31 @@ void exhaleControl(){
 /*-------------------------------------------*/
 
 void computeAverages(){
-  int thisFlow;
+  float thisFlow;
 
   if(inhalationFlag && !exhalationFlag){
-    pPeakAv = ((pPeakAv*pPeakN)+pInhale.getP())/(pPeakN+1); 
+    pPeakAv = (int)((pPeakAv*pPeakN)+pInhale.getP())/(pPeakN+1); 
     pPeakN++;
     if(inhLastF==0){
       inhLastF = inFlow.getFlow();
       inhLastT = micros();
     }else{
-      thisFlow = (inFlow.getFlow()-inhLastF)/(micros()-inhLastT); 
-      inhVolAv = ((inhVolAv*inhVolN)+thisFlow)/(inhVolN+1); 
+      thisFlow = ((inFlow.getFlow()-inhLastF)*1000)/(micros()-inhLastT); 
+      inhVolAv = (int)((inhVolAv*inhVolN)+thisFlow)/(inhVolN+1); 
       inhVolN++;
       inhLastF = inFlow.getFlow();
       inhLastT = micros();
     }
   }
   else if(!inhalationFlag && exhalationFlag){
-    pPeepAv = ((pPeepAv*pPeepN)+pExhale.getP())/(pPeepN+1); 
+    pPeepAv = (int)((pPeepAv*pPeepN)+pExhale.getP())/(pPeepN+1); 
     pPeepN++;
     if(exhLastF==0){
       exhLastF = exFlow.getFlow();
       exhLastT = micros();
     }else{
-      thisFlow = (exFlow.getFlow()-exhLastF)/(micros()-exhLastT); 
-      exhVolAv = ((exhVolAv*exhVolN)+thisFlow)/(exhVolN+1); 
+      thisFlow = ((exFlow.getFlow()-exhLastF)*1000)/(micros()-exhLastT); 
+      exhVolAv = (int)((exhVolAv*exhVolN)+thisFlow)/(exhVolN+1); 
       exhVolN++;
       exhLastF = exFlow.getFlow();
       exhLastT = micros();

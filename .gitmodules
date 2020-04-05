@@ -1,6 +1,3 @@
-[submodule "bruno2Teensy/libraries/LibTempTMP421"]
-	path = bruno2Teensy/libraries/LibTempTMP421
-	url = https://github.com/moderndevice/LibTempTMP421.git
 [submodule "bruno2Teensy/libraries/HoneywellTruStabilitySPI"]
 	path = bruno2Teensy/libraries/HoneywellTruStabilitySPI
 	url = https://github.com/huilab/HoneywellTruStabilitySPI.git

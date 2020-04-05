@@ -7,14 +7,13 @@
 /*            CONTROL VARIABLES              */
 /*-------------------------------------------*/
 
-
 //flow meters
-//venturiFlow oxFlow;
-//venturiFlow aiFlow;
+venturiFlow oxFlow;
+venturiFlow aiFlow;
 venturiFlow inFlow;
 venturiFlow exFlow;
-//uint8_t pinOxFl = 5;
-//uint8_t pinAiFl = 5;
+uint8_t pinOxFl = 9;
+uint8_t pinAiFl = 7;
 uint8_t pinInFl = 5;
 uint8_t pinExFl = 6;
 
@@ -34,12 +33,6 @@ pinchValve exhaleValve;
 uint8_t pinInhale = 14;
 uint8_t pinExhale = 15;
 
-//LED indicators and buttons
-uint8_t pinRedLed = 22;
-uint8_t pinGrnLed = 21;
-
-//buzzer indicators
-uint8_t pinBuzzer = 23;
 
 //TODO -- this should be defined here, now on main ino for now
 ////setpoints
@@ -74,14 +67,14 @@ uint32_t fAirN     = 0; //number val
 uint32_t pPeepAv   = 0; //Pascals
 uint32_t pPeepN    = 0; //number val
 
-uint32_t inhVolAv    = 0;
-uint32_t inhVolN     = 0;
-uint32_t inhLastT    = micros();
-uint32_t inhLastF    = 0;
-uint32_t exhVolAv    = 0;
-uint32_t exhVolN     = 0;
-uint32_t exhLastT    = micros();
-uint32_t exhLastF    = 0;
+uint32_t inhVolAv  = 0;
+uint32_t inhVolN   = 0;
+uint32_t inhLastT  = micros();
+uint32_t inhLastF  = 0;
+uint32_t exhVolAv  = 0;
+uint32_t exhVolN   = 0;
+uint32_t exhLastT  = micros();
+uint32_t exhLastF  = 0;
 
 
 //TODO -- this is to bang-bang control the valves
@@ -116,11 +109,15 @@ void initControl(){
   inhaleValve.init(pinInhale);
   exhaleValve.init(pinExhale);
 
-  exhaleValve.closeValve();
-
   //led indicators and buzzer indicator
   initStatusIndic();
 
+  //init envoronmental sensors
+  initTmpSensor();
+  initHumSensor();
+
+  //get system to a start-ready state
+  exhaleValve.closeValve();
   //TODO -- start as exhale, use flags for now
   inhaleValveLatch = true;
   exhaleValveLatch = true;
@@ -286,50 +283,6 @@ bool allSetptsReady(){
   }
 
   return true;
-}
-/*-------------------------------------------*/
-
-
-/*********************************************/
-/*            INDICATOR SERVICES             */
-/*-------------------------------------------*/
-
-void initStatusIndic(){
-  //led indicators
-  pinMode(pinRedLed, OUTPUT);
-  redLedOnOff(false);
-  pinMode(pinGrnLed, OUTPUT);
-  grnLedOnOff(false);
-  //buzzer indicator
-  pinMode(pinBuzzer, OUTPUT);
-  buzzerOnOff(false);
-}
-/*-------------------------------------------*/
-
-void redLedOnOff(bool stat){
-  if(stat){
-    digitalWrite(pinRedLed, LOW);
-   }else{
-    digitalWrite(pinRedLed, HIGH);
-  }
-}
-/*-------------------------------------------*/
-
-void grnLedOnOff(bool stat){
-  if(stat){
-    digitalWrite(pinGrnLed, LOW);
-   }else{
-    digitalWrite(pinGrnLed, HIGH);
-  }
-}
-/*-------------------------------------------*/
-
-void buzzerOnOff(bool stat){
-  if(stat){
-    digitalWrite(pinBuzzer, HIGH);
-   }else{
-    digitalWrite(pinBuzzer, LOW);
-  }
 }
 /*-------------------------------------------*/
 

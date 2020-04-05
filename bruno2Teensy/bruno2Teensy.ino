@@ -4,9 +4,11 @@
 
 #include "Arduino.h"
 #include <SPI.h>
+#include "Wire.h"
 #include "libraries/honeywellHsc.h"
 #include "libraries/venturiFlow.h"
 #include "libraries/pinchValve.h"
+#include "*/LibTempTMP421.h"
 
 #define BUFFSIZE 15
 #define SERIALTIMEOUT 200
@@ -93,7 +95,8 @@ void setup() {
   updateRespSetpoints();
   //TODO -- lisent for msg DELETE AFTER PI SETUP
   //enableRespirator();
-
+  
+  
 }
 /*-------------------------------------------*/
 /*-------------------------------------------*/
@@ -101,86 +104,92 @@ void setup() {
 
 void loop() {
 
-/*____________________________________________*/
-/*         RUN RASPI COMMS SERVICES           */
-  if(isTimeUp(loopRaspiTime, loopRaspiPeriod)){
-    loopRaspiTime = millis();
-    //This will only take one cmd at a time
-    //otherwse it blocks the code too much
-    if(isRaspiCmdAv()){
-      raspiCmdInterp();
-      runOneRaspiCmd();
-    }
-  }
+  Serial.print("temp: ");
+  Serial.println(getTemp());
+  Serial.print("hum: ");
+  Serial.println(getRelHum());
+  delay(500);
 
-
-/*____________________________________________*/
-/*               RUN SERVICES                 */
-  if(respEnableSt()){
-    offSeqCmpl   = true;
-
-    //run 700Hz services
-    if(isTimeUp(loop700HzTime, loop700HzPeriod)){
-
-      int tmp;
-      tmp = micros()-loop700HzTime;
-      if(tmp>1440){Serial.println(tmp);}
-      loop700HzTime   = micros();
-
-      //start respiration
-      if(!inhalationFlag && !exhalationFlag){
-        respStartTime  = micros();
-        resetAvarages();
-        updateRespSetpoints();
-        inhalationFlag = true;
-        exhalationFlag = false;
-        respRateServ   = true;
-
-      //inhalation control
-      }else if(inhalationFlag && !exhalationFlag){
-        inhaleControl();
-        grnLedOnOff(true);
-
-        if(isTimeUp(respStartTime, inhalePeriod)){
-          inhalationFlag = false;
-          exhalationFlag = true;
-        }
-
-      //exhalation control
-      }else if(!inhalationFlag && exhalationFlag){
-        exhaleControl();
-        grnLedOnOff(false);
-
-        if(isTimeUp(respStartTime, (exhalePeriod+inhalePeriod))){
-          inhalationFlag = false;
-          exhalationFlag = false;
-        }
-      }
-
-    }
-    /*******************************************/
-
-    //run 100Hz services
-    if(isTimeUp(loop100HzTime, loop100HzPeriod)){
-      loop100HzTime   = micros();
-      //computeAverages();
-    }
-    /*******************************************/
-
-    //run respiratory Rate Services
-    if(respRateServ){
-      respRateServ = false;
-      updateRespSetpoints();
-      reportAvarages();
-    }
-    /*******************************************/
-
-  }
-/*____________________________________________*/
-/*             TURN OFF SERVICES              */
-  else if(!respEnableSt() && offSeqCmpl){
-    offSeqCmpl   = true;
-  }
+///*____________________________________________*/
+///*         RUN RASPI COMMS SERVICES           */
+//  if(isTimeUp(loopRaspiTime, loopRaspiPeriod)){
+//    loopRaspiTime = millis();
+//    //This will only take one cmd at a time
+//    //otherwse it blocks the code too much
+//    if(isRaspiCmdAv()){
+//      raspiCmdInterp();
+//      runOneRaspiCmd();
+//    }
+//  }
+//
+//
+///*____________________________________________*/
+///*               RUN SERVICES                 */
+//  if(respEnableSt()){
+//    offSeqCmpl   = true;
+//
+//    //run 700Hz services
+//    if(isTimeUp(loop700HzTime, loop700HzPeriod)){
+//
+//      int tmp;
+//      tmp = micros()-loop700HzTime;
+//      if(tmp>1440){Serial.println(tmp);}
+//      loop700HzTime   = micros();
+//
+//      //start respiration
+//      if(!inhalationFlag && !exhalationFlag){
+//        respStartTime  = micros();
+//        resetAvarages();
+//        updateRespSetpoints();
+//        inhalationFlag = true;
+//        exhalationFlag = false;
+//        respRateServ   = true;
+//
+//      //inhalation control
+//      }else if(inhalationFlag && !exhalationFlag){
+//        inhaleControl();
+//        grnLedOnOff(true);
+//
+//        if(isTimeUp(respStartTime, inhalePeriod)){
+//          inhalationFlag = false;
+//          exhalationFlag = true;
+//        }
+//
+//      //exhalation control
+//      }else if(!inhalationFlag && exhalationFlag){
+//        exhaleControl();
+//        grnLedOnOff(false);
+//
+//        if(isTimeUp(respStartTime, (exhalePeriod+inhalePeriod))){
+//          inhalationFlag = false;
+//          exhalationFlag = false;
+//        }
+//      }
+//
+//    }
+//    /*******************************************/
+//
+//    //run 100Hz services
+//    if(isTimeUp(loop100HzTime, loop100HzPeriod)){
+//      loop100HzTime   = micros();
+//      //computeAverages();
+//    }
+//    /*******************************************/
+//
+//    //run respiratory Rate Services
+//    if(respRateServ){
+//      respRateServ = false;
+//      updateRespSetpoints();
+//      reportAvarages();
+//    }
+//    /*******************************************/
+//
+//  }
+///*____________________________________________*/
+///*             TURN OFF SERVICES              */
+//  else if(!respEnableSt() && offSeqCmpl){
+//    offSeqCmpl   = true;
+//  }
 
 }
 /*-------------------------------------------*/

@@ -7,7 +7,7 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-#include <HoneywellTruStabilitySPI.h>
+#include "HoneywellTruStabilitySPI.h"
 
 /*********************************************/
 /*                CLASS DEF                  */

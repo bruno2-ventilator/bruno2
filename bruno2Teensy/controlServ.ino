@@ -84,7 +84,6 @@ uint32_t exhLastT    = micros();
 uint32_t exhLastF    = 0;
 
 
-
 //TODO -- this is to bang-bang control the valves
 bool inhaleValveLatch;
 bool exhaleValveLatch;
@@ -102,12 +101,12 @@ void initTeensyModules(){
 /*-------------------------------------------*/
 
 void initControl(){
-  //init flow meters  
+  //init flow meters
   //oxFlow.init(pinOxFl);
   //aiFlow.init(pinAiFl);
   inFlow.init(pinInFl);
   exFlow.init(pinExFl);
-  
+
   //init pressure sensors
   pMix.init(pinMixP, pRange1Ba);
   pInhale.init(pinInhaleP, pRange60mBa);
@@ -136,21 +135,29 @@ void initControl(){
 
 //TODO -- here for now
 void reportAvarages(){
-  Serial.print("/ms1v");
   Serial.print(pPeakAv);
-  Serial.println("t");
-
-  Serial.print("/ms4v");
+  Serial.print(",");
   Serial.print(pPeepAv);
-  Serial.println("t");
-
-  Serial.print("/ms5v");
+  Serial.print(",");
   Serial.print(inhVolAv);
-  Serial.println("t");
-
-  Serial.print("/ms6v");
+  Serial.print(",");
   Serial.print(exhVolAv);
-  Serial.println("t");
+  Serial.println(",");
+//  Serial.print("/ms1v");
+//  Serial.print(pPeakAv);
+//  Serial.println("t");
+//
+//  Serial.print("/ms4v");
+//  Serial.print(pPeepAv);
+//  Serial.println("t");
+//
+//  Serial.print("/ms5v");
+//  Serial.print(inhVolAv);
+//  Serial.println("t");
+//
+//  Serial.print("/ms6v");
+//  Serial.print(exhVolAv);
+//  Serial.println("t");
 }
 /*-------------------------------------------*/
 
@@ -163,9 +170,9 @@ void reportAvarages(){
 void inhaleControl(){
   if(inhaleValveLatch){
     if(moveSteps>currCnt){
-      inhaleValve.open1StValve();  
+      inhaleValve.open1StValve();
       delayMicroseconds(5);
-      exhaleValve.close1StValve();  
+      exhaleValve.close1StValve();
       currCnt++;
     }else{
       inhaleValveLatch = false;
@@ -181,9 +188,9 @@ void inhaleControl(){
 void exhaleControl(){
   if(exhaleValveLatch){
     if(moveSteps>currCnt){
-      exhaleValve.open1StValve();  
+      exhaleValve.open1StValve();
       delayMicroseconds(5);
-      inhaleValve.close1StValve();  
+      inhaleValve.close1StValve();
       currCnt++;
     }else{
       exhaleValveLatch = false;
@@ -206,28 +213,28 @@ void computeAverages(){
   float thisFlow;
 
   if(inhalationFlag && !exhalationFlag){
-    pPeakAv = (int)((pPeakAv*pPeakN)+pInhale.getP())/(pPeakN+1); 
+    pPeakAv = (int)((pPeakAv*pPeakN)+pInhale.getP())/(pPeakN+1);
     pPeakN++;
     if(inhLastF==0){
       inhLastF = inFlow.getFlow();
       inhLastT = micros();
     }else{
-      thisFlow = ((inFlow.getFlow()-inhLastF)*1000)/(micros()-inhLastT); 
-      inhVolAv = (int)((inhVolAv*inhVolN)+thisFlow)/(inhVolN+1); 
+      thisFlow = ((inFlow.getFlow()-inhLastF)*1000)/(micros()-inhLastT);
+      inhVolAv = (int)((inhVolAv*inhVolN)+thisFlow)/(inhVolN+1);
       inhVolN++;
       inhLastF = inFlow.getFlow();
       inhLastT = micros();
     }
   }
   else if(!inhalationFlag && exhalationFlag){
-    pPeepAv = (int)((pPeepAv*pPeepN)+pExhale.getP())/(pPeepN+1); 
+    pPeepAv = (int)((pPeepAv*pPeepN)+pExhale.getP())/(pPeepN+1);
     pPeepN++;
     if(exhLastF==0){
       exhLastF = exFlow.getFlow();
       exhLastT = micros();
     }else{
-      thisFlow = ((exFlow.getFlow()-exhLastF)*1000)/(micros()-exhLastT); 
-      exhVolAv = (int)((exhVolAv*exhVolN)+thisFlow)/(exhVolN+1); 
+      thisFlow = ((exFlow.getFlow()-exhLastF)*1000)/(micros()-exhLastT);
+      exhVolAv = (int)((exhVolAv*exhVolN)+thisFlow)/(exhVolN+1);
       exhVolN++;
       exhLastF = exFlow.getFlow();
       exhLastT = micros();

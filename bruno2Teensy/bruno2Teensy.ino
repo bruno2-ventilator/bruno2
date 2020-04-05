@@ -94,7 +94,6 @@ void setup() {
   //TODO -- lisent for msg DELETE AFTER PI SETUP
   //enableRespirator();
 
-
 }
 /*-------------------------------------------*/
 /*-------------------------------------------*/
@@ -110,7 +109,7 @@ void loop() {
     //otherwse it blocks the code too much
     if(isRaspiCmdAv()){
       raspiCmdInterp();
-      runOneRaspiCmd(); 
+      runOneRaspiCmd();
     }
   }
 
@@ -122,11 +121,12 @@ void loop() {
 
     //run 700Hz services
     if(isTimeUp(loop700HzTime, loop700HzPeriod)){
-      //int tmp;
-      //tmp = micros()-loop700HzTime;
-      //if(tmp>1436){Serial.println(tmp);}
+
+      int tmp;
+      tmp = micros()-loop700HzTime;
+      if(tmp>1440){Serial.println(tmp);}
       loop700HzTime   = micros();
-      
+
       //start respiration
       if(!inhalationFlag && !exhalationFlag){
         respStartTime  = micros();
@@ -146,7 +146,7 @@ void loop() {
           exhalationFlag = true;
         }
 
-      //exhalation control  
+      //exhalation control
       }else if(!inhalationFlag && exhalationFlag){
         exhaleControl();
         grnLedOnOff(false);
@@ -156,14 +156,15 @@ void loop() {
           exhalationFlag = false;
         }
       }
-    }  
+
+    }
     /*******************************************/
 
     //run 100Hz services
     if(isTimeUp(loop100HzTime, loop100HzPeriod)){
       loop100HzTime   = micros();
       //computeAverages();
-    }  
+    }
     /*******************************************/
 
     //run respiratory Rate Services
@@ -171,16 +172,16 @@ void loop() {
       respRateServ = false;
       updateRespSetpoints();
       reportAvarages();
-    }  
+    }
     /*******************************************/
-  
+
   }
 /*____________________________________________*/
 /*             TURN OFF SERVICES              */
   else if(!respEnableSt() && offSeqCmpl){
     offSeqCmpl   = true;
   }
-  
+
 }
 /*-------------------------------------------*/
 /*-------------------------------------------*/

@@ -6,7 +6,7 @@
 #include "Arduino.h"
 #include <SPI.h>
 #include "libraries/pinchValve.h"
-#include <HighPowerStepperDriver.h>
+#include "HighPowerStepperDriver.h"
 
 #define PRINTDEB false
 

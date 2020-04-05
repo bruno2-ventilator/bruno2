@@ -64,7 +64,7 @@ void runOneRaspiCmd(){}
 void raspiCmdInterp(){
   int i, j, k;
   i = findBuffIdx('/');
-  
+
   int val;
   i++;
   switch(rcmdbuff[i]){
@@ -153,7 +153,7 @@ int findBuffIdx(char look){
       break;
     }
   }
-  
+
   if(!found){return -1;}
 
   return ii;

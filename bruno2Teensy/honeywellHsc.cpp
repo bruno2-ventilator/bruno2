@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include <SPI.h>
 #include "libraries/honeywellHsc.h"
-#include <HoneywellTruStabilitySPI.h>
+#include "HoneywellTruStabilitySPI.h"
 
 #define PRINTDEB false
 
@@ -28,7 +28,7 @@ void honeywellHsc::init(uint8_t spics, int pRange){
   pres->begin();
   //pinMode(_spics, OUTPUT);
   //digitalWrite(_spics, HIGH); //CS high to disable
-  
+
   if(PRINTDEB){Serial.println("m: init press");}
 
 }
@@ -64,7 +64,7 @@ void honeywellHsc::getRaw(){
 
   digitalWrite(_spics, HIGH);      //pull Chipselect Pin to High
   SPI.endTransaction();            //end SPI Transaction
-  
+
   _praw = (inByte_1 & 0x3F) << 8 | inByte_2;
   //Serial.print(inByte_1,BIN);
   //Serial.print("  ");
@@ -73,7 +73,7 @@ void honeywellHsc::getRaw(){
   //Serial.print(inByte_3,BIN);
   //Serial.print("  ");
   //Serial.println(inByte_4,BIN);
-  //Serial.println(_praw, BIN); 
+  //Serial.println(_praw, BIN);
   //inByte_3 = inByte_3 << 3; //Shift first Temperature byte 3 left
   //_tempC = inByte_4;
   //_tempC = ((float)inByte_3 * 200 / 2047) - 50; //Convert Digital value to °C
@@ -85,17 +85,17 @@ float honeywellHsc::getP(){
 
   if(_unitChFlag==1){
     if(_units=='p'){      //Psi
-      _calib = 0.000145038;     
+      _calib = 0.000145038;
     }
     else if(_units=='m'){ //mmMercury
-      _calib = 0.0075006;     
+      _calib = 0.0075006;
     }
-    else if(_units=='w'){ //mmWater 
+    else if(_units=='w'){ //mmWater
       _calib = 0.1019716;
-    } 
+    }
     else if(_units=='a'){ //pAscals (def)
-      _calib = 1;     
-    } 
+      _calib = 1;
+    }
     _unitChFlag = 0;
   }
 

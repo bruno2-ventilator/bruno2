@@ -5,7 +5,6 @@
 #include "Arduino.h"
 #include <SPI.h>
 #include "libraries/honeywellHsc.h"
-#include "HoneywellTruStabilitySPI.h"
 
 #define PRINTDEB false
 

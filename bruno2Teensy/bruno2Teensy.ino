@@ -8,7 +8,8 @@
 #include "libraries/honeywellHsc.h"
 #include "libraries/venturiFlow.h"
 #include "libraries/pinchValve.h"
-#include "*/LibTempTMP421.h"
+#include "Adafruit_BME280.h"
+#include "LibTempTMP421.h"
 
 #define BUFFSIZE 15
 #define SERIALTIMEOUT 200

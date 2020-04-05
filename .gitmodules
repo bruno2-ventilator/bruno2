@@ -1,6 +1,0 @@
-[submodule "bruno2Teensy/libraries/HoneywellTruStabilitySPI"]
-	path = bruno2Teensy/libraries/HoneywellTruStabilitySPI
-	url = https://github.com/huilab/HoneywellTruStabilitySPI.git
-[submodule "bruno2Teensy/libraries/high-power-stepper-driver-arduino"]
-	path = bruno2Teensy/libraries/high-power-stepper-driver-arduino
-	url = https://github.com/pololu/high-power-stepper-driver-arduino.git

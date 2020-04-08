@@ -95,8 +95,8 @@ void initTeensyModules(){
 
 void initControl(){
   //init flow meters
-  //oxFlow.init(pinOxFl);
-  //aiFlow.init(pinAiFl);
+  oxFlow.init(pinOxFl);
+  aiFlow.init(pinAiFl);
   inFlow.init(pinInFl);
   exFlow.init(pinExFl);
 
@@ -243,6 +243,27 @@ void computeAverages(){
 
 
 /*********************************************/
+/*              SENSOR SERVICES              */
+/*-------------------------------------------*/
+
+void updatePresSensors(){
+  //flow sensors
+  oxFlow.filFlowRead();
+  aiFlow.filFlowRead();
+  inFlow.filFlowRead();
+  exFlow.filFlowRead();
+
+  //pressure sensors
+  pMix.filPresRead();
+  pInhale.filPresRead();
+  pExhale.filPresRead();
+  
+}
+/*-------------------------------------------*/
+
+
+
+/*********************************************/
 /*              ADHOC SERVICES               */
 /*-------------------------------------------*/
 
@@ -287,13 +308,25 @@ bool allSetptsReady(){
 /*-------------------------------------------*/
 
 void printPresSensors(){
-  Serial.print("pMix ");
-  Serial.println(pMix.getP());
-  Serial.print("pInhale ");
-  Serial.println(pInhale.getP());
-  Serial.print("pExhale ");
-  Serial.println(pExhale.getP());
+  Serial.print("pmix: ");
+  Serial.print(pMix.getP());
+  Serial.print("\tpin: ");
+  Serial.print(pInhale.getP());
+  Serial.print("\tpex: ");
+  Serial.print(pExhale.getP());
+  Serial.print("\noxf: ");
+  Serial.print(oxFlow.getFlow());
+  Serial.print("\taif: ");
+  Serial.print(aiFlow.getFlow());
+  Serial.print("\tinf: ");
+  Serial.print(inFlow.getFlow());
+  Serial.print("\texf: ");
+  Serial.println(exFlow.getFlow());
 }
 /*-------------------------------------------*/
+
+int thisthis(){
+  return pMix.getRaw();
+}
 
 /*EOF*/

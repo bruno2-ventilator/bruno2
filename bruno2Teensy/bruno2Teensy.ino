@@ -2,14 +2,14 @@
 /*                           BRUNO2 VENTILATOR                             */
 /*-------------------------------------------------------------------------*/
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <SPI.h>
-#include "Wire.h"
+#include <Wire.h>
 #include "libraries/honeywellHsc.h"
 #include "libraries/venturiFlow.h"
 #include "libraries/pinchValve.h"
-#include "Adafruit_BME280.h"
-#include "LibTempTMP421.h"
+#include <Adafruit_BME280.h>
+#include <LibTempTMP421.h>
 
 #define BUFFSIZE 15
 #define SERIALTIMEOUT 200
@@ -28,6 +28,7 @@ uint32_t loop100HzPeriod = 10000;     //100hz average values
 uint32_t respStartTime   = micros();
 uint32_t inhalePeriod    = 0;         //depends on respR
 uint32_t exhalePeriod    = 0;         //depends on respR
+uint32_t presSensorTime  = micros();
 
 //main loop flags
 bool offSeqCmpl     = false;
@@ -65,6 +66,9 @@ int tidVolExLow  = 1;
 
 //TODO -- for now to control loop motor step speed
 uint32_t loop700HzPeriod = 1428;      //700hz main contol
+
+int array[200];
+bool cont = true;
 
 /*********************************************/
 /*           BRUNO2 VENTILATOR               */
@@ -105,92 +109,110 @@ void setup() {
 
 void loop() {
 
-  Serial.print("temp: ");
-  Serial.println(getTemp());
-  Serial.print("hum: ");
-  Serial.println(getRelHum());
-  delay(500);
+//  if(cont){
+//    for(int i = 0; i<200; i++){
+//      array[i] = (int)(floor(thisthis()*100));
+//      delay(1);
+//    }
+//    for(int i = 0; i<200; i++){
+//      Serial.println(array[i]);
+//      delay(100);
+//    }
+//    cont = false;
+//  }
 
-///*____________________________________________*/
-///*         RUN RASPI COMMS SERVICES           */
-//  if(isTimeUp(loopRaspiTime, loopRaspiPeriod)){
-//    loopRaspiTime = millis();
-//    //This will only take one cmd at a time
-//    //otherwse it blocks the code too much
-//    if(isRaspiCmdAv()){
-//      raspiCmdInterp();
-//      runOneRaspiCmd();
-//    }
-//  }
-//
-//
-///*____________________________________________*/
-///*               RUN SERVICES                 */
-//  if(respEnableSt()){
-//    offSeqCmpl   = true;
-//
-//    //run 700Hz services
-//    if(isTimeUp(loop700HzTime, loop700HzPeriod)){
-//
-//      int tmp;
-//      tmp = micros()-loop700HzTime;
-//      if(tmp>1440){Serial.println(tmp);}
-//      loop700HzTime   = micros();
-//
-//      //start respiration
-//      if(!inhalationFlag && !exhalationFlag){
-//        respStartTime  = micros();
-//        resetAvarages();
-//        updateRespSetpoints();
-//        inhalationFlag = true;
-//        exhalationFlag = false;
-//        respRateServ   = true;
-//
-//      //inhalation control
-//      }else if(inhalationFlag && !exhalationFlag){
-//        inhaleControl();
-//        grnLedOnOff(true);
-//
-//        if(isTimeUp(respStartTime, inhalePeriod)){
-//          inhalationFlag = false;
-//          exhalationFlag = true;
-//        }
-//
-//      //exhalation control
-//      }else if(!inhalationFlag && exhalationFlag){
-//        exhaleControl();
-//        grnLedOnOff(false);
-//
-//        if(isTimeUp(respStartTime, (exhalePeriod+inhalePeriod))){
-//          inhalationFlag = false;
-//          exhalationFlag = false;
-//        }
-//      }
-//
-//    }
-//    /*******************************************/
-//
-//    //run 100Hz services
-//    if(isTimeUp(loop100HzTime, loop100HzPeriod)){
-//      loop100HzTime   = micros();
-//      //computeAverages();
-//    }
-//    /*******************************************/
-//
-//    //run respiratory Rate Services
-//    if(respRateServ){
-//      respRateServ = false;
-//      updateRespSetpoints();
-//      reportAvarages();
-//    }
-//    /*******************************************/
-//
-//  }
-///*____________________________________________*/
-///*             TURN OFF SERVICES              */
-//  else if(!respEnableSt() && offSeqCmpl){
-//    offSeqCmpl   = true;
-//  }
+//printPresSensors();
+Serial.println(thisthis(), BIN);
+delay(1500);
+
+/*____________________________________________*/
+/*         RUN RASPI COMMS SERVICES           */
+  if(isTimeUp(loopRaspiTime, loopRaspiPeriod)){
+    loopRaspiTime = millis();
+    //This will only take one cmd at a time
+    //otherwse it blocks the code too much
+    if(isRaspiCmdAv()){
+      raspiCmdInterp();
+      runOneRaspiCmd();
+    }
+  }
+
+
+/*____________________________________________*/
+/*               RUN SERVICES                 */
+  if(respEnableSt()){
+    offSeqCmpl   = true;
+
+    //run 700Hz services
+    if(isTimeUp(loop700HzTime, loop700HzPeriod)){
+
+      int tmp;
+      tmp = micros()-loop700HzTime;
+      if(tmp>1440){Serial.println(tmp);}
+      loop700HzTime   = micros();
+
+      //start respiration
+      if(!inhalationFlag && !exhalationFlag){
+        respStartTime  = micros();
+        resetAvarages();
+        updateRespSetpoints();
+        inhalationFlag = true;
+        exhalationFlag = false;
+        respRateServ   = true;
+
+      //inhalation control
+      }else if(inhalationFlag && !exhalationFlag){
+        inhaleControl();
+        grnLedOnOff(true);
+
+        if(isTimeUp(respStartTime, inhalePeriod)){
+          inhalationFlag = false;
+          exhalationFlag = true;
+        }
+
+      //exhalation control
+      }else if(!inhalationFlag && exhalationFlag){
+        exhaleControl();
+        grnLedOnOff(false);
+
+        if(isTimeUp(respStartTime, (exhalePeriod+inhalePeriod))){
+          inhalationFlag = false;
+          exhalationFlag = false;
+        }
+      }
+
+    }
+    /*******************************************/
+
+    //run P sensor reading services
+    //TODO -- period not freq
+    if(isTimeUp(presSensorTime, honeywellHsc::_samplingFreq)){
+      presSensorTime  = micros();
+      updatePresSensors();
+    }
+    /*******************************************/
+
+    //run 100Hz services
+    if(isTimeUp(loop100HzTime, loop100HzPeriod)){
+      loop100HzTime   = micros();
+      //computeAverages();
+    }
+    /*******************************************/
+
+    //run respiratory Rate Services
+    if(respRateServ){
+      respRateServ = false;
+      updateRespSetpoints();
+      reportAvarages();
+    }
+    /*******************************************/
+
+  }
+/*____________________________________________*/
+/*             TURN OFF SERVICES              */
+  else if(!respEnableSt() && offSeqCmpl){
+    offSeqCmpl   = true;
+  }
 
 }
 /*-------------------------------------------*/

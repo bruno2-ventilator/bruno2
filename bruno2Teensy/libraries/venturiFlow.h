@@ -19,9 +19,12 @@ class venturiFlow
     void setUnits(char units);
     char getUnits();
     float getFlow();
+    void filFlowRead();
+    float getRawP();
   private:
     const int _pRangeSense = 6000; //using hscmrrn060mdsa3
-    char  _units = 'l'; //lit/min
+    char  _units = 'm'; //cm^3/s
+    int _calib   = 1;
     uint8_t _unitChFlag = 1;
     honeywellHsc *pSen;
 

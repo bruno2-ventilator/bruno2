@@ -44,9 +44,35 @@ char venturiFlow::getUnits(){
 
 float venturiFlow::getFlow(){
   float tpSen;
+  int sign = 1;
   tpSen = pSen->getP();
+  
+  if(tpSen<0){sign = -1;}
 
-  return (0.442*sqrt(tpSen*1000));
+  if(_unitChFlag==1){
+    if(_units=='l'){      //Psi
+      _calib = 1;
+    }
+    else if(_units=='m'){ //mmMercury
+      _calib = 1000;
+    }
+    else if(_units=='i'){ //mmWater
+      _calib = 61;
+    }
+    _unitChFlag = 0;
+  }
+
+  return (float)(sign*0.442*sqrt(abs(tpSen)*1000)*_calib); //in l/s
+}
+/*-------------------------------------------*/
+
+float venturiFlow::getRawP(){
+  return pSen->getP();
+}
+/*-------------------------------------------*/
+
+float venturiFlow::filFlowRead(){
+  return pSen->filPresRead();
 }
 /*-------------------------------------------*/
 

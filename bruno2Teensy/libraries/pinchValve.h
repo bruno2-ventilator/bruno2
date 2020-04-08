@@ -7,7 +7,7 @@
 
 #include "Arduino.h"
 #include <SPI.h>
-#include "HighPowerStepperDriver.h"
+#include <HighPowerStepperDriver.h>
 
 /*********************************************/
 /*                CLASS DEF                  */

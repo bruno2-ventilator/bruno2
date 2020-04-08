@@ -8,13 +8,13 @@
 /*-------------------------------------------*/
 
 //tem/hum sensors BME280
-#define PINBME280 10;
+#define PINBME280 10
 Adafruit_BME280 bme(PINBME280);
 int bmeDelayTime = 1000000;  // in microseconds
 
 //temp sensor TMP421
 uint8_t tempI2cAdd = 0x2A;
-LibTempTMP421 temp = LibTempTMP421(0, I2Caddress);
+LibTempTMP421 temp = LibTempTMP421(0, tempI2cAdd);
 
 /*|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
 /*                          ENV SENS FUNCTIONS                             */

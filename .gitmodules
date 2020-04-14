@@ -1,0 +1,3 @@
+[submodule "other/Elecrow-LCD5"]
+	path = other/Elecrow-LCD5
+	url = https://github.com/Elecrow-keen/Elecrow-LCD5.git

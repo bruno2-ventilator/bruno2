@@ -1,0 +1,15 @@
+# make sure the caption is always shown at the bottom
+caption always "%{= kw}%-w%{= BW}%n %t%{-}%+w %-= @%H - %LD %d %LM - %c"
+
+# dont display
+startup_message off
+
+# tab-completion flash off
+vbell off
+
+# allow scrollback
+defscrollback 1000
+
+
+#forward colors
+term xterm-256color

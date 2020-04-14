@@ -151,7 +151,7 @@ sudo apt-get update
 sudo reboot
 ```
 
-On device boot, you should be able to ssh to the current session `screen -r bruno2App'
+On device boot, you should be able to ssh to the current session `screen -r bruno2App`
 
 
 ---

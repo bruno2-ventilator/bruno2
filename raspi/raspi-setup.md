@@ -22,11 +22,19 @@
 	2. Wi-Fi
 	3. enter SSID of the network you are in
 	4. enter the password of that network
-3. Enable SSH comm by typing `sudo raspi-config`
+3. install `sudo apt-get install xinput-calibrator`
+4. Get the necesary changes to make the display work (NOTE: this overwrites the /boot/config.txt and /boot/cmdline.txt which absolutely sucks)
+	- TODO -- fork this submodule so that /boot/config.txt and /boot/cmdline.txt are not replaced but ammended
+	```console
+	cd ~/bruno2/other/Elecrow-LCD5/Elecrow-LCD5
+	chmod +x Elecrow-LCD5
+	sudo ./Elecrow-LCD5
+	```
+4. Enable SSH comm by typing `sudo raspi-config`
 	1. interfacing options
 	2. P2 SSH
 	3. YES
-4. disable bluetooth
+5. disable bluetooth
 	1. `sudo vim /boot/config.txt`
 	2. Add at the end of the file:
 		```console
@@ -63,9 +71,20 @@
 	3. **brunopi**
 12. reboot
 
-### Installations that are optional but good
+### Other stuff
+1. remove trash incon and change backgroind from desktop
+	1. in file `sudo vim ~/.config/pcmanfm/LXDE-pi/desktop-items-0.conf`
+	2. add/change the line `show_trash=0`
+	3. add/change the line `show_mounts=0`
+	4. change the line `wallpaper=/home/bruno2/bruno2/other/logo.png`
+	5. change the mode `wallpaper_mode=fit`
+	6. change the background color `desktop_bg=#ffffff`
+
+
+### Installations that are optional but good (for debugging only really)
 - `sudo apt-get install vim`
 - `sudo apt-get install screen`
+- `sudo apt-get install meld`
 
 ---
 ## BrunO2 application
@@ -74,17 +93,73 @@
 	sudo apt-get install git
 	git clone https://github.com/alberto-bortoni/bruno2.git
 	```
-2.
-2. `sudo raspi-config`
-	1. Boot options
-	2. Splash screen
+2. change splash screen:
+	1. `sudo raspi-config`
+		1. Boot options
+		2. Splash screen
+		3. yes
+	2. open: `sudo vim /boot/config.txt` and add the line at the end
+		```console
+		#disable rainbow splash screen
+		disable_splash=1
+		```
+	3. open `sudo vim /usr/share/plymouth/themes/pix/pix.script` and comment out the lines with #
+		```console
+		message_sprite = Sprite();
+		message_sprite.SetPosition(screen_width * 0.1, screen_height * 0.9, 10000);
+		my_image = Image.Text(text, 1, 1, 1);
+    	message_sprite.SetImage(my_image);
+		```
+	4. open `sudo vim /boot/cmdline.txt` and add the following commands (NOTE dont add if its already there)
+		```console
+		consoleblank=0 loglevel=1 splash quiet plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_default=0
+		```
+	5. replace the splash screen with bruno2 image `sudo cp bruno2/other/splash-screen.png /usr/share/plymouth/themes/pix/splash.png`
+
+3. install python `sudo apt-get install python3-pyqt5`
+4. make sure the application can run as admin
+	```console
+	sudo cp ~/bruno2/raspi/bruno2.desktop /etc/xdg/autostart/bruno2.desktop
+	chmod a+x ~/bruno2/raspi/startBrunO2.sh
+	```
+5. Do some environment changes to startup: remove the manu bar, prevent session from blanking or sleeping.
+	1. open `sudo vim /etc/xdg/lxsession/LXDE-pi/autostart`
+	2. comment with # the line `@lxpanel --profile LXDE-pi`
+	3. add the following lines:
+	```console
+	@xset s noblank
+	@xset s off
+	@xset -dpms
+	@unclutter -idle 0
+	```
+	4. install unclutter `sudo apt-get install unclutter`
+6. copy all the rc files for ease of operation with
+	1. `cd ~/bruno2/other/rcfiles`
+	3. `cp -f .screenrc .bashrc .nanorc .vimrc`
+	4. if you are trying to use vim as your edditor then run the following too:
+	5. `curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`
+	6. enter vim: `vim`
+	7. inside vim in command mode do: `:PlugInstall`
 
 
-remove stuff on bar and auto run
 
--include splash screen
-- vimrc screenrc nanorc bashrc
-
-
-sudo apt-get update
 ---
+## Wrap-up
+
+```console
+sudo apt-get update
+sudo reboot
+```
+
+On device boot, you should be able to ssh to the current session `screen -r bruno2App'
+
+
+---
+## TODOS
+- remove app border (prevent from user X out)
+- application fullscreen
+- disable touchscreen
+- detect usb devices and use correctly on code
+- the smg that is at startup on boot
+- ssh welcome msg
+- should clone the img of this sd card to flash new ones with everything loaded

@@ -122,7 +122,7 @@ void raspiCmdInterp(){
           tidVolExLow  = val;
           sendAckMsg();
           break;
-        default
+        default:
           if(PRINTDEB){Serial.println("Not a command");}
         break;
       }

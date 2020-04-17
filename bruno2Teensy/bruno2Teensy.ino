@@ -134,6 +134,7 @@ void loop() {
 
       //start respiration
       if(!inhalationFlag && !exhalationFlag){
+        if(PRINTDEB){Serial.println("start inhale");}
         respStartTime  = micros();
         resetAvarages();
         updateRespSetpoints();
@@ -147,6 +148,7 @@ void loop() {
         grnLedOnOff(true);
 
         if(isTimeUp(respStartTime, inhalePeriodUs)){
+          if(PRINTDEB){Serial.println("start exhale");}
           inhalationFlag = false;
           exhalationFlag = true;
         }
@@ -157,6 +159,7 @@ void loop() {
         grnLedOnOff(false);
 
         if(isTimeUp(respStartTime, (exhalePeriodUs+inhalePeriodUs))){
+          if(PRINTDEB){Serial.println("end resp");}
           inhalationFlag = false;
           exhalationFlag = false;
         }
@@ -177,8 +180,8 @@ void loop() {
       int tmp;
       int tmpTime;
 
-      tmpTime = loop100HzTime;
-      loop100HzTime = micros();
+      tmpTime = loopPrintTime;
+      loopPrintTime = micros();
 
       if(PRINTDEB){
         tmp = micros()-tmpTime;
@@ -215,7 +218,7 @@ void loop() {
 /*____________________________________________*/
 /*             TURN OFF SERVICES              */
   else if(!respEnableSt() && offSeqCmpl){
-    offSeqCmpl   = true;
+    offSeqCmpl   = false;
   }
 
 }

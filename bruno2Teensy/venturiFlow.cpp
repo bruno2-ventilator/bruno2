@@ -66,13 +66,28 @@ float venturiFlow::getFlow(){
 }
 /*-------------------------------------------*/
 
-float venturiFlow::getRawP(){
+float venturiFlow::getP(){
   return pSen->getP();
 }
 /*-------------------------------------------*/
 
-float venturiFlow::filFlowRead(){
-  return pSen->filPresRead();
+float venturiFlow::getUnfilP(){
+  return pSen->getUnfilP();
+}
+/*-------------------------------------------*/
+
+void venturiFlow::filFlowRead(){
+  pSen->filPresRead();
+}
+/*-------------------------------------------*/
+
+void venturiFlow::setOffset(){
+  pSen->setOffset();
+}
+/*-------------------------------------------*/
+
+float venturiFlow::getOffset(){
+  return pSen->getOffset();
 }
 /*-------------------------------------------*/
 

@@ -19,10 +19,6 @@ uint8_t pinBuzzer = 23;
 /*                         INDICATOR FUNCTIONS                             */
 /*-------------------------------------------------------------------------*/
 
-/*********************************************/
-/*                  LEDS                     */
-/*-------------------------------------------*/
-
 void initStatusIndic(){
   //led indicators
   pinMode(pinRedLed, OUTPUT);
@@ -32,8 +28,37 @@ void initStatusIndic(){
   //buzzer indicator
   pinMode(pinBuzzer, OUTPUT);
   buzzerOnOff(false);
+  analogWriteFrequency(pinBuzzer, 1000);
 }
 /*-------------------------------------------*/
+
+void deviceReadySignal(){
+  redLedOnOff(true);
+  grnLedOnOff(true);
+  buzzerOnOff(true);
+  delay(500);
+
+  redLedOnOff(false);
+  grnLedOnOff(false);
+  buzzerOnOff(false);
+  delay(300);
+
+  redLedOnOff(true);
+  grnLedOnOff(true);
+  buzzerOnOff(true);
+  delay(500);
+
+  redLedOnOff(false);
+  grnLedOnOff(false);
+  buzzerOnOff(false);
+}
+/*-------------------------------------------*/
+
+
+/*********************************************/
+/*                  LEDS                     */
+/*-------------------------------------------*/
+
 
 void redLedOnOff(bool stat){
   if(stat){
@@ -60,10 +85,36 @@ void grnLedOnOff(bool stat){
 
 void buzzerOnOff(bool stat){
   if(stat){
-    digitalWrite(pinBuzzer, HIGH);
+    analogWrite(pinBuzzer, 127);
    }else{
-    digitalWrite(pinBuzzer, LOW);
+    analogWrite(pinBuzzer, 0);
   }
+}
+/*-------------------------------------------*/
+
+void buzzerOnOff(bool stat, int freq){
+  int val = map(freq, 0, 100, 1, 255);
+
+  if(stat){
+    analogWrite(pinBuzzer, val);
+   }else{
+    analogWrite(pinBuzzer, 0);
+  }
+}
+/*-------------------------------------------*/
+
+void sweepSoundBlocking(int durMs, int startFq, int stopFq){
+  //TODO -- reeval min and max
+  int pwmStart = map(startFq, 0, 100, 0, 255);
+  int pwmStop  = map(stopFq,  0, 100, 0, 255);
+  int delayTim = durMs/(pwmStop-pwmStart);
+
+  for(int i = pwmStart; i<pwmStop; i++){
+    analogWrite(pinBuzzer, i);
+    delay(delayTim);
+  }
+  
+  analogWrite(pinBuzzer, 0);
 }
 /*-------------------------------------------*/
 

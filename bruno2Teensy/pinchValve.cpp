@@ -13,7 +13,7 @@
 /*                 METHODS                   */
 /*-------------------------------------------*/
 
-void pinchValve::init(uint8_t spics){
+void pinchValve::init(uint8_t spics, uint8_t pinOpen, uint8_t pinClose){
   //init sensor with addres for p1 and p2
   _spics = spics;
 
@@ -40,39 +40,51 @@ void pinchValve::init(uint8_t spics){
   // Enable the motor outputs.
   mot->enableDriver();
 
+  //enable limit Sw
+  _pinOp = pinOpen;
+  _pinCl = pinClose;
+  pinMode(_pinOp, INPUT);
+  pinMode(_pinCl, INPUT);
+
   if(PRINTDEB){Serial.println("m: init pinch valve motor");}
 }
 /*-------------------------------------------*/
 
-void pinchValve::closeValve(){
-  mot->setDirection(_direction);
-  for (int i = 0; i < _mStPerRev/4; i++) {
-    mot->step();
-    delayMicroseconds(_stPeriodUs);
+void pinchValve::closeValveBlocking(){
+  if(!isValveFullClose()){
+    mot->setDirection(_direction);
+    do{
+      mot->step();
+      delayMicroseconds(_stPeriodUs);
+    }while(!isValveFullClose());
   }
 }
 /*-------------------------------------------*/
 
-void pinchValve::openValve(){
-  mot->setDirection(!_direction);
-  for (int i = 0; i < _mStPerRev/4; i++) {
-    mot->step();
-
-    //TODO -- delaying here as patch, idealy would pos control in main loop
-    delayMicroseconds(_stPeriodUs);
+void pinchValve::openValveBlocking(){
+  if(!isValveFullOpen()){
+    mot->setDirection(!_direction);
+    do{
+      mot->step();
+      delayMicroseconds(_stPeriodUs);
+    }while(!isValveFullOpen());
   }
 }
 /*-------------------------------------------*/
 
 void pinchValve::close1StValve(){
-  mot->setDirection(_direction);
-  mot->step();
+  if(!isValveFullClose()){
+    mot->setDirection(_direction);
+    mot->step();
+  }
 }
 /*-------------------------------------------*/
 
 void pinchValve::open1StValve(){
-  mot->setDirection(!_direction);
-  mot->step();
+  if(!isValveFullOpen()){
+    mot->setDirection(!_direction);
+    mot->step();
+  }
 }
 /*-------------------------------------------*/
 
@@ -87,6 +99,16 @@ void pinchValve::moveToPosRel(int pos){
     //TODO -- delaying here as patch, idealy would pos control in main loop
     delayMicroseconds(_stPeriodUs);
   }
+}
+/*-------------------------------------------*/
+
+bool pinchValve::isValveFullClose(){
+  return digitalRead(_pinCl);
+}
+/*-------------------------------------------*/
+
+bool pinchValve::isValveFullOpen(){
+  return digitalRead(_pinOp);
 }
 /*-------------------------------------------*/
 

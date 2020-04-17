@@ -20,26 +20,34 @@ class honeywellHsc
     void init(uint8_t spics, int pRange); //in pascals
     void setUnits(char units);
     char getUnits();
+    int16_t getRaw();
+    float getUnfilP();
     float getP();
     void filPresRead();
-    int getRaw();
     void setOffset();
-    const uint32_t _samplingFreq = 2800; //in Hz
+    float getOffset();
+    //from datasheet, data ready in average 1ms
+    //static const uint32_t sampPeriodUs = 1100; //900Hz
   private:
-    TruStabilityPressureSensor *pres;
-    int _minPress;  //Pascals
-    int _maxPress;  //Pascals
+    //TruStabilityPressureSensor *pres;
+    int _minPress = -1;  //Pascals
+    int _maxPress =  1;  //Pascals
+    const int _minOutCnt = 1638; 
+    const int _maxOutCnt = 14745;
     const int _clkFreq    = 500000; //hz - 50~800khz
     char      _units      = 'a';    //pAscal, Psi, mmMercury, mmWater
     uint8_t   _spics;
-    float     _calib      = 1;
+    float     _calib      = 1.0;
     float     _tempC;
-    uint16_t  _praw       = 0;
-    float     pout        = 0;
-    int32_t   _pOffset    = 0;
+    int16_t   _praw       = 0;
+    uint8_t   _status     = 0;
+    //float     pout        = 0;
+    float     _pOffset    = 0;
     uint8_t   _unitChFlag = 1;
-    uint32_t  _cutoffFreq = 700; //in Hz
-    Filter fil(_cutoffFreq, (float)(1/_samplingFreq), IIR::ORDER::ODER2, IIR::TYPE::LOWPASS);
+    uint32_t  _offSampFq  = 200; // in HZ
+    uint32_t  _offSampN   = 400;
+    //const float     _cutoffFreq = 400; //in Hz
+    //Filter *fil;
 
 };
 #endif

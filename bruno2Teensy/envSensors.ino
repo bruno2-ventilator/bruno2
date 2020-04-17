@@ -8,8 +8,10 @@
 /*-------------------------------------------*/
 
 //tem/hum sensors BME280
-#define PINBME280 10
-Adafruit_BME280 bme(PINBME280);
+//#define PINBME280 10
+uint8_t pinBme280 = 20;
+Adafruit_BME280 *bme;
+//Adafruit_BME280 bme(PINBME280);
 int bmeDelayTime = 1000000;  // in microseconds
 
 //temp sensor TMP421
@@ -51,8 +53,10 @@ float getTempF(){
 
 void initHumSensor(){
   //bme.begin();
-  bme.init();
-  bme.setSampling(Adafruit_BME280::MODE_FORCED,
+  bme = new Adafruit_BME280(pinBme280);
+
+  bme->init();
+  bme->setSampling(Adafruit_BME280::MODE_FORCED,
                   Adafruit_BME280::SAMPLING_X1,   // temperature
                   Adafruit_BME280::SAMPLING_NONE, // pressure
                   Adafruit_BME280::SAMPLING_X1,   // humidity
@@ -62,8 +66,8 @@ void initHumSensor(){
 /*-------------------------------------------*/
 
 float getRelHum(){
-  bme.takeForcedMeasurement();
-  return bme.readHumidity();
+  bme->takeForcedMeasurement();
+  return bme->readHumidity();
 }
 /*-------------------------------------------*/
 

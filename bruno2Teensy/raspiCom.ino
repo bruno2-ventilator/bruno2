@@ -6,6 +6,8 @@
 char rcmdbuff[BUFFSIZE];
 bool enableOutput = false;
 
+#define PRINTDEB true
+
 /*********************************************/
 /*           BRUNO2 VENTILATOR               */
 /*-------------------------------------------*/
@@ -68,28 +70,15 @@ void raspiCmdInterp(){
   int val;
   i++;
   switch(rcmdbuff[i]){
-    case 'q':
-      inhaleValve.moveToPosRel(4);
-      break;
-    case 'w':
-      inhaleValve.moveToPosRel(-4);
-      break;
-    case 'z':
-      exhaleValve.moveToPosRel(4);
-      break;
-    case 'x':
-      exhaleValve.moveToPosRel(-4);
-      break;
-    case 'm':
-      //
-      break;
     case 'p':
-      enableRespirator();
+      disableRespirator();
       sendAckMsg();
+      if(PRINTDEB){Serial.println("Device paused");}
       break;
     case 's':
       enableRespirator();
       sendAckMsg();
+      if(PRINTDEB){Serial.println("Device resumed");}
       break;
     case 'c':
       j   = findBuffIdx('v');
@@ -118,7 +107,7 @@ void raspiCmdInterp(){
           sendAckMsg();
           break;
         case '5':
-          respR = (int)(60*1000000/val);
+          respRtUs = (int)(60*1000000/val);
           sendAckMsg();
           break;
         case '6':
@@ -133,10 +122,13 @@ void raspiCmdInterp(){
           tidVolExLow  = val;
           sendAckMsg();
           break;
+        default
+          if(PRINTDEB){Serial.println("Not a command");}
+        break;
       }
       break;
     default:
-      //
+      if(PRINTDEB){Serial.println("Not a command");}
       break;
   }
 }

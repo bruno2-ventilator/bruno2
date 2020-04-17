@@ -16,14 +16,18 @@ class pinchValve
 {
 
   public:
-    void init(uint8_t spics);
-    void closeValve();
-    void openValve();
+    void init(uint8_t spics, uint8_t pinOpen, uint8_t pinClose);
+    void closeValveBlocking();
+    void openValveBlocking();
     void close1StValve();
     void open1StValve();
     void moveToPosRel(int pos);
+    bool isValveFullClose();
+    bool isValveFullOpen();
   private:
     uint8_t _spics;
+    uint8_t _pinOp;
+    uint8_t _pinCl;
     bool _direction    = true; //change to false if rotating is opposite
     int _stepsPerRev   = 200; //from motor datasheet
     int _mStPerRev;

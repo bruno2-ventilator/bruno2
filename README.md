@@ -3,11 +3,19 @@ This repository contains design information for a low cost ventilator designed b
 
 ---
 
-These open source ventilator design materials are provided under the conditions specified in the Permissive License. 
+These open source ventilator design materials are provided under the conditions specified in the [Permissive License](Permissive License--Brown University 041720.pdf). 
 
 ---
 
+Getting Started:
 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 ---
 # Contributors to the BrunO2 project include:

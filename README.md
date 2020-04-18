@@ -5,6 +5,14 @@ This repository contains design information for a low cost ventilator designed b
 These open source ventilator design materials are provided under the conditions specified in the [Permissive License](Permissive%20License--Brown%20University%20041720.pdf)
 
 ---
+Quick Links:
+[System](Design%20Materials/System/)
+[Mechanical](Design%20Materials/Mechanical/)
+[Software](Design%20Materials/Software/)
+[Electronics](Design%20Materials/Electronics/)
+
+
+---
 Getting Started:
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

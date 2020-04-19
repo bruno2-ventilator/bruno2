@@ -1,3 +1,15 @@
+---
+## Venturi Design
+
+Please refer to [Venturi_Design_Documentation.pdf](Venturi_Design_Documentation.pdf)
+
+
+---
+## License
+These open source ventilator design materials are provided under the conditions specified in the [Permissive License](https://github.com/bruno2-ventilator/bruno2/blob/master/Permissive%20License--Brown%20University%20041720.pdf)
+
+---
+
 This venturi flow sensor was designed to measure the flow rate of an air-oxygen mixture in a rapidly manufacturable ventilator produced at Brown University. It is designed to be printed on a high resolution 3D printer out of biocompatible, autoclavable medium, like Form Lab’s ‘Surgical Guide’ resin. The venturi has barbs on its inlet and outlet so that it can be placed inline with 3/4" ID tygon tubing. The device is modeled in inches.
 
 In the ventilator, this device is paired with a differential pressure sensor: Honeywell 060MDSA-3.

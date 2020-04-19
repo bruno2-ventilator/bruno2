@@ -1,10 +1,3 @@
-
-
-###
-#NOTES EOD 3/28:
-#Sending signals
-#
-
 from PyQt5 import uic
 from time import sleep
 from PyQt5.QtCore import QEvent, QThread, pyqtSignal, Qt, pyqtSlot, QTimer, QObject
@@ -16,7 +9,6 @@ from serial import Serial, SerialException
 from enum import Enum
 import platform
 import sys
-#import numpy as np
 
 
 class ERROR_CODES(Enum):
@@ -45,8 +37,6 @@ class ALERT_CODES(Enum):
         
 class vent_ui(QMainWindow):
     def __init__(self):
-        #QWidget.__init__(self)
-
         super(self.__class__, self).__init__()
         self.setup_ui()
         self.port = 'COM10'
@@ -66,22 +56,8 @@ class vent_ui(QMainWindow):
         self.init_setting_codes = [SETTING_CODES.PIP,SETTING_CODES.PEEP,SETTING_CODES.RR,SETTING_CODES.IE]
         self.init_settings = [self.pip_set,self.peep_set,self.rr,self.inhale/self.exhale]
 
-    # @pyqtSlot()
-    # def handle_error(self, er):
-    #     if er == ERROR_CODES.WATCHDOG_FAIL:
-    #         print("Failed watchdog")
-        
-            
-    # @pyqtSlot(float)
-    # def handle_thread_to_main(self,val):
-    #     print("handled in main:")
-    #     print(val)
-
-    #updates go teensy->pi, changes go pi->teensy
     @pyqtSlot()
     def check_serial(self):
-        #print("Checking serial...")
-        #TODO: Catch Exceptions for disconnections
         if self.ser.in_waiting:
             messages  = self.ser.read(self.ser.in_waiting).split(b"/")
             for message in messages:
@@ -92,7 +68,6 @@ class vent_ui(QMainWindow):
                         command_num_index =message.find(b's')
                         ascii_to_int = 48
                         if begin_val <0 or end_val <0 or command_num_index <0:
-                            #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
                             return
                         handle_dict = {\
                         1:self.update_PIP, \
@@ -103,7 +78,6 @@ class vent_ui(QMainWindow):
                         6:self.update_V_TE}
                         command_num = message[command_num_index+1]-ascii_to_int
                         if command_num > 6 or command_num < 1:
-                            #self.raise_alert(ALERT_CODES.BAD_MESSAGE)
                             return
                         func = handle_dict[command_num]
                         func(int(message[begin_val+1:end_val]))
@@ -273,7 +247,6 @@ class vent_ui(QMainWindow):
         command = ""
         if enum_num == SETTING_CODES.IE:
             command = "/cs%dv%2.3fdt\n" % (enum_num.value,value)
-            #print(command)
         else:
             command = "/cs%dv%dt\n" % (enum_num.value,value)
         if self.connect_status and self.ser.is_open:

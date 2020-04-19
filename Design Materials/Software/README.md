@@ -5,6 +5,10 @@ This repository contains firmware and user interface software for a low cost ven
 These open source ventilator design materials are provided under the conditions specified in the [Permissive License](../../Permissive%20License--Brown%20University%20041720.pdf)
 
 ---
+# MORE DETAILS COMING SOON
+
+
+---
 # To setup Teensy board
 ## Install arduino and Teensyduino
 1. from [Arduini](https://www.arduino.cc/en/main/software) download the lattest supported version for teensy.

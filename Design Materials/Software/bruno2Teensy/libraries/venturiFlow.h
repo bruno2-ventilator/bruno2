@@ -6,7 +6,7 @@
 #define venturiFlow_h
 
 #include "Arduino.h"
-#include "./lib/pressureSensor.h"
+#include "honeywellHsc.h"
 
 /*********************************************/
 /*                CLASS DEF                  */
@@ -15,17 +15,21 @@ class venturiFlow
 {
 
   public:
-    venturiFlow(int p1add, int p2add);
-    void setUnits(char unit);
+    void init(uint8_t pAdd);
+    void setUnits(char units);
     char getUnits();
     float getFlow();
+    void filFlowRead();
+    float getP();
+    float getUnfilP();
+    void setOffset();
+    float getOffset();
   private:
-    void initSensor();
-    int _p1add;
-    int _p2add;
-    int _calib = 0.34;
-    //pressureSensor p1
-    //pressureSensor p2
+    const int _pRangeSense = 6000; //using hscmrrn060mdsa3
+    char    _units   = 'm'; //cm^3/s
+    float   _calib   = 1;
+    uint8_t _unitChFlag = 1;
+    honeywellHsc *pSen;
 
 };
 #endif

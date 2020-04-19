@@ -1,0 +1,21 @@
+include /usr/share/nano/sh.nanorc
+include /usr/share/nano/c.nanorc
+
+
+# Use this tab size instead of the default; it must be greater than 0 
+set tabsize 2
+
+# Use smooth scrolling as the default 
+set smooth
+
+# Don't wrap text at all 
+set nowrap
+
+# Don't display the help lists at the bottom of the screen 
+set nohelp
+
+# Use auto-indentation 
+set autoindent
+
+# Convert tabs to spaces
+set tabstospaces

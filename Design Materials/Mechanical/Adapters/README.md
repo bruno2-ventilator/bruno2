@@ -1,6 +1,6 @@
 # BrunO2 Cam Pinch Valve Design Materials
 
-Please refer to [Adapter_Documentation.pdf]
+Please refer to [Adapter_Documentation.pdf](Adapter_Documentation.pdf)
 
 This documents is a compilation of the 3D models of generic tube adapters and fittings we made for testing purposes. They were designed to be printed on a high resolution stereolithography 3D printer using biocompatible resin (Form Lab’s ‘Surgical Guide’ resin). All models included in this document have been shared in STL and STEP formats.
 
